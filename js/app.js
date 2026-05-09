@@ -147,11 +147,26 @@ const APP = (() => {
   /* ══════════════════════════════════════════════════════════
      INIT
   ══════════════════════════════════════════════════════════ */
-  async function init() {
+async function init() {
     loading(true);
     try {
-      state.dropdowns = await gasGet('getDropdownData');
-      await loadEntries();
+      // Load dropdowns and entries in parallel for speed
+      const [dropdowns, entries] = await Promise.all([
+        gasGet('getDropdownData'),
+        gasGet('getAllEstimates')
+      ]);
+
+      // Store dropdowns in state so edit screen can use them
+      state.dropdowns = dropdowns || {
+        catA: [], catB: [], additionalWorks: [], gypsum: [], kitchenAcc: []
+      };
+
+      // Store entries in state
+      state.estimates = entries || [];
+
+      // Render entries screen
+      renderEntries(state.estimates);
+
     } catch (e) {
       toast('Init error: ' + e.message, 'err');
     } finally {
@@ -240,9 +255,18 @@ const APP = (() => {
     document.getElementById('editSub').textContent   = 'Fill client details and select tables';
     document.getElementById('f_estimateDate').value  = new Date().toISOString().split('T')[0];
     document.getElementById('f_estimationNo').value  = 'DOC-' + Date.now().toString().slice(-6);
+
+    // Refresh dropdowns before showing edit screen
+    if (!state.dropdowns || !state.dropdowns.catA || !state.dropdowns.catA.length) {
+      gasGet('getDropdownData').then(d => {
+        state.dropdowns = d || { catA:[], catB:[], additionalWorks:[], gypsum:[], kitchenAcc:[] };
+        renderAll();
+      });
+    }
+
     showScreen('edit');
   }
-
+   
   function editEstimate(id) {
     const est = state.estimates.find(e => e.id === id);
     if (!est) { toast('Not found', 'err'); return; }
