@@ -135,10 +135,20 @@ const APP = (() => {
 
   /* ── Screen router ─────────────────────────────────────── */
   function showScreen(name) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    // Hide all screens first
+    document.querySelectorAll('.screen').forEach(s => {
+      s.classList.remove('active');
+      s.classList.add('hidden');
+    });
+    // Deactivate all nav tabs
     document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-    document.getElementById('screen-' + name).classList.add('active');
-    document.querySelector(`[data-screen="${name}"]`).classList.add('active');
+    // Show the requested screen
+    var target = document.getElementById('screen-' + name);
+    if (target) { target.classList.add('active'); target.classList.remove('hidden'); }
+    // Activate matching nav tab
+    var tab = document.querySelector('[data-screen="' + name + '"]');
+    if (tab) tab.classList.add('active');
+    // Screen-specific side effects
     if (name === 'preview') renderPreview();
     if (name === 'admin')   loadAdminData();
     if (name === 'entries') loadEntries();
@@ -147,26 +157,20 @@ const APP = (() => {
   /* ══════════════════════════════════════════════════════════
      INIT
   ══════════════════════════════════════════════════════════ */
-async function init() {
+  async function init() {
     loading(true);
     try {
-      // Load dropdowns and entries in parallel for speed
-      const [dropdowns, entries] = await Promise.all([
+      // Load dropdowns AND entries at the same time for speed
+      const results = await Promise.all([
         gasGet('getDropdownData'),
         gasGet('getAllEstimates')
       ]);
-
-      // Store dropdowns in state so edit screen can use them
-      state.dropdowns = dropdowns || {
-        catA: [], catB: [], additionalWorks: [], gypsum: [], kitchenAcc: []
-      };
-
-      // Store entries in state
-      state.estimates = entries || [];
-
-      // Render entries screen
+      // Store dropdowns — critical for the edit screen to work
+      state.dropdowns = results[0] || { catA:[], catB:[], additionalWorks:[], gypsum:[], kitchenAcc:[] };
+      // Store entries
+      state.estimates = results[1] || [];
+      // Render the entries list
       renderEntries(state.estimates);
-
     } catch (e) {
       toast('Init error: ' + e.message, 'err');
     } finally {
@@ -255,18 +259,23 @@ async function init() {
     document.getElementById('editSub').textContent   = 'Fill client details and select tables';
     document.getElementById('f_estimateDate').value  = new Date().toISOString().split('T')[0];
     document.getElementById('f_estimationNo').value  = 'DOC-' + Date.now().toString().slice(-6);
-
-    // Refresh dropdowns before showing edit screen
-    if (!state.dropdowns || !state.dropdowns.catA || !state.dropdowns.catA.length) {
-      gasGet('getDropdownData').then(d => {
+    // Make sure dropdowns are loaded before showing the edit screen
+    if (!state.dropdowns || !state.dropdowns.catA || state.dropdowns.catA.length === 0) {
+      loading(true);
+      gasGet('getDropdownData').then(function(d) {
         state.dropdowns = d || { catA:[], catB:[], additionalWorks:[], gypsum:[], kitchenAcc:[] };
-        renderAll();
+        loading(false);
+        showScreen('edit');
+      }).catch(function(e) {
+        loading(false);
+        toast('Could not load dropdowns: ' + e.message, 'err');
+        showScreen('edit');
       });
+    } else {
+      showScreen('edit');
     }
-
-    showScreen('edit');
   }
-   
+
   function editEstimate(id) {
     const est = state.estimates.find(e => e.id === id);
     if (!est) { toast('Not found', 'err'); return; }
