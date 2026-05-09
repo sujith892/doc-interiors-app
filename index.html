@@ -1,345 +1,1107 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DOC Interiors – Estimation App</title>
-  <link rel="stylesheet" href="css/style.css" />
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>DOC Interiors – Estimation App</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --gold:#b79c7d;--gold-dk:#9a8160;--gold-lt:#f2ede4;
+  --navy:#0d0d18;--navy2:#1a1a2e;
+  --text:#3a3a3a;--muted:#888;--border:#e0dbd2;
+  --bg:#f8f6f3;--white:#fff;
+  --danger:#dc3545;--success:#28a745;--r:8px;
+  --shadow:0 2px 12px rgba(0,0,0,.08);
+}
+body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.config-banner{background:var(--navy2);color:#fff;padding:18px 24px;border-bottom:2px solid var(--gold);display:none}
+.config-inner{max-width:700px;margin:0 auto}
+.config-title{font-size:15px;font-weight:700;margin-bottom:6px}
+.config-desc{font-size:13px;opacity:.85;margin-bottom:12px;line-height:1.5}
+.config-row{display:flex;gap:8px}
+.config-row input{flex:1;padding:9px 14px;border-radius:var(--r);border:1px solid #555;background:#111;color:#fff;font-size:13px;font-family:monospace}
+.config-row button{padding:9px 22px;border-radius:var(--r);border:none;background:var(--gold);color:#fff;cursor:pointer;font-weight:700;font-size:13px}
+.config-row button:hover{background:var(--gold-dk)}
+.config-hint{font-size:11px;opacity:.5;margin-top:8px}
+.status-bar{background:#0d1117;color:#8b949e;font-size:12px;padding:5px 24px;border-bottom:1px solid #30363d;font-family:monospace;display:none}
+.status-bar a{color:var(--gold);text-decoration:none}
+.navbar{display:flex;align-items:center;justify-content:space-between;background:var(--navy);padding:0 20px;height:56px;box-shadow:0 2px 8px rgba(0,0,0,.3);position:sticky;top:0;z-index:200}
+.nav-brand{display:flex;align-items:center;gap:10px}
+.nav-bar{width:6px;height:30px;background:var(--gold);border-radius:3px}
+.nav-title{color:#fff;font-size:17px;font-weight:700;letter-spacing:2px}
+.gold{color:var(--gold)}
+.nav-tabs{display:flex;gap:3px}
+.nav-tab{background:transparent;border:none;color:#aaa;padding:7px 14px;border-radius:var(--r);cursor:pointer;font-size:13px;font-weight:500;transition:all .2s}
+.nav-tab:hover{background:rgba(183,156,125,.15);color:var(--gold)}
+.nav-tab.active{background:var(--gold);color:#fff}
+.nav-icon-btn{background:transparent;border:none;color:#aaa;font-size:17px;cursor:pointer;padding:4px 8px;border-radius:var(--r)}
+.nav-icon-btn:hover{color:var(--gold)}
+.screen{display:none;padding:22px;min-height:calc(100vh - 56px)}
+.screen.active{display:block}
+.screen-hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px}
+.screen-hdr h2{font-size:19px;color:var(--navy)}
+.screen-hdr .sub{font-size:12px;color:var(--muted);margin-top:3px}
+.hdr-btns{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.card{background:var(--white);border-radius:var(--r);box-shadow:var(--shadow);border:1px solid var(--border);padding:20px}
+.mb{margin-bottom:18px}
+.card-hdr{display:flex;align-items:center;justify-content:space-between;padding-bottom:12px;margin-bottom:16px;border-bottom:2px solid var(--gold)}
+.card-title{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--navy)}
+.badge-must{font-size:10px;font-weight:700;color:var(--gold);border:1px solid var(--gold);padding:2px 8px;border-radius:20px}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:8px 15px;border-radius:var(--r);border:none;cursor:pointer;font-size:13px;font-weight:600;transition:all .18s}
+.btn-primary{background:var(--gold);color:#fff}.btn-primary:hover{background:var(--gold-dk)}
+.btn-danger{background:var(--danger);color:#fff}.btn-danger:hover{filter:brightness(.9)}
+.btn-success{background:var(--success);color:#fff}.btn-success:hover{filter:brightness(.9)}
+.btn-outline{background:transparent;border:1.5px solid var(--gold);color:var(--gold)}.btn-outline:hover{background:var(--gold);color:#fff}
+.btn-sm{padding:5px 10px;font-size:12px}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:13px}
+.fg{display:flex;flex-direction:column;gap:4px}
+.fg label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px}
+.fc{border:1.5px solid var(--border);border-radius:var(--r);padding:8px 11px;font-size:13px;color:var(--text);background:var(--white);width:100%;transition:border .18s}
+.fc:focus{outline:none;border-color:var(--gold)}
+.search-box{border:1.5px solid var(--border);border-radius:var(--r);padding:7px 13px;font-size:13px;width:240px}
+.search-box:focus{outline:none;border-color:var(--gold)}
+.tbl-scroll{overflow-x:auto}
+.data-tbl{width:100%;border-collapse:collapse;font-size:13px}
+.data-tbl thead tr{background:var(--navy);color:#fff}
+.data-tbl thead th{padding:10px 12px;text-align:left;font-size:11px;letter-spacing:1px;text-transform:uppercase;white-space:nowrap}
+.data-tbl tbody tr{border-bottom:1px solid var(--border);transition:background .12s}
+.data-tbl tbody tr:hover{background:var(--gold-lt)}
+.data-tbl tbody td{padding:9px 12px}
+.empty{text-align:center;padding:40px;color:var(--muted)}
+.badge-active{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;background:#d4edda;color:#155724}
+.table-toggles{display:flex;flex-wrap:wrap;gap:9px}
+.ttbtn{padding:7px 15px;border-radius:20px;border:2px solid var(--border);background:var(--white);color:var(--muted);cursor:pointer;font-size:12px;font-weight:600;transition:all .18s}
+.ttbtn.on{border-color:var(--gold);background:var(--gold);color:#fff}
+.ttbtn.mandatory{border-color:var(--navy);background:var(--navy);color:#fff;cursor:default}
+.est-block{margin-bottom:20px}
+.blk-hdr{display:flex;align-items:center;justify-content:space-between;background:var(--navy);color:#fff;padding:9px 15px;border-radius:var(--r) var(--r) 0 0;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase}
+.blk-hint{font-size:11px;color:#aaa;font-weight:400;letter-spacing:0;text-transform:none}
+.blk-body{background:var(--white);border:1px solid var(--border);border-top:none}
+.est-tbl{width:100%;border-collapse:collapse;font-size:12px;min-width:700px}
+.est-tbl thead tr{background:var(--gold-lt)}
+.est-tbl thead th{padding:8px 6px;text-align:center;font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--gold-dk);border-bottom:2px solid var(--gold);white-space:nowrap}
+.est-tbl thead th:first-child{text-align:left;padding-left:11px}
+.est-tbl tbody td{padding:6px 5px;border-bottom:1px solid var(--border);text-align:center;vertical-align:middle}
+.est-tbl tbody td:first-child{text-align:left;padding-left:11px;color:var(--muted);font-size:11px}
+.ti{border:1px solid var(--border);border-radius:4px;padding:5px 6px;font-size:12px;width:100%;text-align:center;background:#fff;-moz-appearance:textfield}
+.ti::-webkit-outer-spin-button,.ti::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.ti:focus{outline:none;border-color:var(--gold)}
+.ts{border:1px solid var(--border);border-radius:4px;padding:5px 3px;font-size:11px;width:100%;background:var(--white)}
+.ts:focus{outline:none;border-color:var(--gold)}
+.computed{display:inline-block;background:var(--gold-lt);color:var(--gold-dk);font-weight:700;font-size:12px;padding:4px 6px;border-radius:4px}
+.tot-row{background:var(--gold-lt)}
+.tot-row td{border-top:2px solid var(--gold);color:var(--navy);font-size:12px;font-weight:700;padding:9px 7px}
+.tot-label{text-align:right;padding-right:11px!important;font-size:10px;letter-spacing:1px}
+.btn-del-row{background:transparent;border:none;cursor:pointer;color:var(--danger);font-size:14px;padding:2px 6px;border-radius:4px;line-height:1}
+.btn-del-row:hover{background:#fde8e8}
+.add-row-btn{display:flex;align-items:center;justify-content:center;gap:6px;padding:9px;width:100%;background:var(--gold-lt);border:1.5px dashed var(--gold);color:var(--gold-dk);font-size:12px;font-weight:600;border-radius:0 0 var(--r) var(--r);cursor:pointer;transition:background .18s}
+.add-row-btn:hover{background:#ede8df}
+.grand-total-bar{display:flex;align-items:center;justify-content:space-between;background:var(--navy);color:#fff;border-radius:var(--r);padding:15px 22px;margin-top:18px}
+.gt-label{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#aaa}
+.gt-sub{font-size:11px;color:#555;margin-top:2px}
+.gt-value{font-size:24px;font-weight:700;color:var(--gold)}
+.preview-wrap{background:#f0f0f0;padding:18px;border-radius:var(--r)}
+.preview-ph{text-align:center;padding:60px;color:var(--muted);font-size:14px}
+.admin-tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.atab{padding:7px 15px;border-radius:20px;border:1.5px solid var(--border);background:var(--white);color:var(--muted);cursor:pointer;font-size:12px;font-weight:600;transition:all .18s}
+.atab:hover{border-color:var(--gold-dk)}
+.atab.active{border-color:var(--gold);background:var(--gold);color:#fff}
+.admin-tbl{width:100%;border-collapse:collapse;font-size:13px}
+.admin-tbl thead tr{background:var(--gold-lt)}
+.admin-tbl thead th{padding:9px 11px;text-align:left;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold-dk);border-bottom:2px solid var(--gold)}
+.admin-tbl tbody tr{border-bottom:1px solid var(--border)}
+.admin-tbl tbody tr:hover{background:var(--bg)}
+.admin-tbl tbody td{padding:8px 11px}
+.ai{border:1px solid var(--border);border-radius:4px;padding:5px 7px;font-size:12px;width:100%}
+.ai:focus{outline:none;border-color:var(--gold)}
+.pic-preview{width:50px;height:50px;object-fit:cover;border-radius:4px;border:1px solid var(--border);display:block}
+.pic-placeholder{width:50px;height:50px;background:var(--gold-lt);border-radius:4px;border:1px dashed var(--gold);display:flex;align-items:center;justify-content:center;font-size:18px}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;display:none;align-items:center;justify-content:center}
+.modal{background:#fff;border-radius:var(--r);padding:22px;max-width:480px;width:92%;box-shadow:0 8px 32px rgba(0,0,0,.2)}
+.modal h3{font-size:15px;font-weight:700;color:var(--navy);margin-bottom:9px}
+.modal p{color:var(--muted);font-size:13px;margin-bottom:18px}
+.modal-fields{display:flex;flex-direction:column;gap:11px;margin-bottom:18px}
+.modal-actions{display:flex;gap:9px;justify-content:flex-end}
+.toast{position:fixed;bottom:22px;right:22px;z-index:9999;background:var(--navy);color:#fff;padding:11px 18px;border-radius:var(--r);font-size:13px;box-shadow:0 4px 20px rgba(0,0,0,.25);border-left:4px solid var(--gold);max-width:300px;display:none}
+.toast.show{display:block}
+.toast.ok{border-color:var(--success)}
+.toast.err{border-color:var(--danger)}
+.loading-overlay{position:fixed;inset:0;background:rgba(13,13,24,.65);z-index:9998;display:none;flex-direction:column;align-items:center;justify-content:center;gap:13px;color:#fff}
+.loading-overlay.show{display:flex}
+.spinner{width:40px;height:40px;border-radius:50%;border:4px solid rgba(183,156,125,.3);border-top-color:var(--gold);animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media print{
+  .navbar,.screen-hdr .hdr-btns,.config-banner,.status-bar,.toast,.loading-overlay{display:none!important}
+  body{background:#f0f0f0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .screen.active{padding:0}
+  .preview-wrap{background:none!important;padding:0!important}
+  @page{size:A4;margin:0}
+}
+@media(max-width:768px){
+  .nav-tabs .nav-tab{padding:6px 9px;font-size:11px}
+  .screen{padding:12px}
+  .form-grid{grid-template-columns:1fr}
+}
+</style>
 </head>
 <body>
 
-<!-- ══════════════════════════════════
-     CONFIG BANNER  (first-time setup)
-     ══════════════════════════════════ -->
-<div id="configBanner" class="config-banner hidden">
+<div id="configBanner" class="config-banner">
   <div class="config-inner">
-    <div style="font-size:15px;font-weight:700;margin-bottom:6px;">⚙️ First-Time Setup</div>
-    <div style="font-size:13px;opacity:.85;margin-bottom:12px;">
-      Paste your <strong>Google Apps Script Web App URL</strong> below.<br>
-      The Spreadsheet ID will be fetched <em>automatically</em> from your <code>Code.gs</code> — you don't need to enter it here.
+    <div class="config-title">⚙️ First-Time Setup</div>
+    <div class="config-desc">Paste your <strong>Google Apps Script Web App URL</strong> below. The Spreadsheet ID is fetched automatically from <code>Code.gs</code>.</div>
+    <div class="config-row">
+      <input type="text" id="gasUrlInput" placeholder="https://script.google.com/macros/s/YOUR_ID/exec"/>
+      <button onclick="saveGasUrl()">Connect →</button>
     </div>
-    <div class="config-input-row">
-      <input type="text" id="gasUrlInput"
-        placeholder="https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec" />
-      <button onclick="APP.saveGasUrl()">Connect →</button>
-    </div>
-    <div style="font-size:11px;opacity:.55;margin-top:8px;">
-      💡 Get this URL from: Apps Script editor → Deploy → Manage deployments → copy the Web App URL
-    </div>
+    <div class="config-hint">💡 Apps Script → Deploy → Manage deployments → Web App URL</div>
   </div>
 </div>
+<div id="statusBar" class="status-bar"></div>
 
-<!-- Status bar: shows which spreadsheet is active -->
-<div id="statusBar" class="status-bar hidden"></div>
-
-<!-- ══════════════════════════════════
-     NAVBAR
-     ══════════════════════════════════ -->
 <nav class="navbar">
-  <div class="nav-brand">
-    <div class="nav-bar"></div>
-    <span class="nav-title">DOC <span class="gold">INTERIORS</span></span>
-  </div>
+  <div class="nav-brand"><div class="nav-bar"></div><span class="nav-title">DOC <span class="gold">INTERIORS</span></span></div>
   <div class="nav-tabs">
-    <button class="nav-tab active" data-screen="entries"  onclick="APP.showScreen('entries')">📋 Entries</button>
-    <button class="nav-tab"        data-screen="edit"     onclick="APP.showScreen('edit')">✏️ New / Edit</button>
-    <button class="nav-tab"        data-screen="preview"  onclick="APP.showScreen('preview')">👁 Preview</button>
-    <button class="nav-tab"        data-screen="admin"    onclick="APP.showScreen('admin')">⚙️ Admin</button>
+    <button class="nav-tab active" onclick="showScreen('entries')">📋 Entries</button>
+    <button class="nav-tab"        onclick="showScreen('edit')">✏️ New / Edit</button>
+    <button class="nav-tab"        onclick="showScreen('preview')">👁 Preview</button>
+    <button class="nav-tab"        onclick="showScreen('admin')">⚙️ Admin</button>
   </div>
-  <button class="nav-settings" title="Change GAS URL" onclick="APP.openConfig()">🔗</button>
+  <button class="nav-icon-btn" onclick="toggleConfig()" title="Change GAS URL">🔗</button>
 </nav>
 
-<!-- toast -->
-<div id="toast" class="toast hidden"></div>
+<div id="toast" class="toast"></div>
+<div id="loading" class="loading-overlay"><div class="spinner"></div><p>Please wait…</p></div>
 
-<!-- loading -->
-<div id="loading" class="loading-overlay hidden">
-  <div class="spinner"></div><p>Please wait…</p>
-</div>
-
-<!-- ══════════════════════════════════
-     SCREEN 1 – ENTRIES
-     ══════════════════════════════════ -->
-<section id="screen-entries" class="screen active">
-  <div class="screen-header">
-    <div>
-      <h2>📋 All Estimates</h2>
-      <p class="sub">Saved entries loaded from Google Sheets</p>
-    </div>
-    <div class="hdr-actions">
-      <input id="searchInput" type="text" class="search-box" placeholder="🔍 Search client, ID…" oninput="APP.filterEntries()" />
-      <button class="btn btn-primary" onclick="APP.startNew()">+ New Estimate</button>
-      <button class="btn btn-outline btn-sm" onclick="APP.loadEntries()">↻ Refresh</button>
+<!-- SCREEN 1: ENTRIES -->
+<div id="screen-entries" class="screen active">
+  <div class="screen-hdr">
+    <div><h2>📋 All Estimates</h2><p class="sub">Saved entries from Google Sheets</p></div>
+    <div class="hdr-btns">
+      <input id="searchInput" type="text" class="search-box" placeholder="🔍 Search…" oninput="filterEntries()"/>
+      <button class="btn btn-primary" onclick="startNew()">+ New Estimate</button>
+      <button class="btn btn-outline btn-sm" onclick="loadEntries()">↻ Refresh</button>
     </div>
   </div>
   <div class="card">
-    <div class="table-scroll">
-      <table class="data-table" id="entriesTable">
-        <thead>
-          <tr>
-            <th>#</th><th>Est. No.</th><th>Client Name</th><th>Site Address</th>
-            <th>Mobile</th><th>Est. Date</th><th>Prepared By</th><th>Status</th><th>Actions</th>
-          </tr>
-        </thead>
-        <tbody id="entriesBody">
-          <tr><td colspan="9" class="empty">Loading…</td></tr>
-        </tbody>
+    <div class="tbl-scroll">
+      <table class="data-tbl">
+        <thead><tr><th>#</th><th>Est. No.</th><th>Client</th><th>Site Address</th><th>Mobile</th><th>Date</th><th>Prepared By</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody id="entriesBody"><tr><td colspan="9" class="empty">Loading…</td></tr></tbody>
       </table>
     </div>
   </div>
-</section>
+</div>
 
-<!-- ══════════════════════════════════
-     SCREEN 2 – EDIT / NEW
-     ══════════════════════════════════ -->
-<section id="screen-edit" class="screen hidden">
-
-  <div class="screen-header">
-    <div>
-      <h2 id="editTitle">✏️ New Estimate</h2>
-      <p class="sub" id="editSub">Fill client details and select tables</p>
-    </div>
-    <div class="hdr-actions">
-      <button class="btn btn-outline" onclick="APP.showScreen('entries')">← Back</button>
-      <button class="btn btn-success" onclick="APP.saveEstimate()">💾 Save</button>
+<!-- SCREEN 2: EDIT / NEW -->
+<div id="screen-edit" class="screen">
+  <div class="screen-hdr">
+    <div><h2 id="editTitle">✏️ New Estimate</h2><p class="sub" id="editSub">Fill client details and select tables</p></div>
+    <div class="hdr-btns">
+      <button class="btn btn-outline" onclick="showScreen('entries')">← Back</button>
+      <button class="btn btn-success" onclick="saveEstimate()">💾 Save</button>
     </div>
   </div>
 
-  <!-- CLIENT CARD -->
   <div class="card mb">
-    <div class="card-header">
-      <span class="card-title">👤 Client Details</span>
-      <span class="badge-mandatory">MANDATORY</span>
-    </div>
+    <div class="card-hdr"><span class="card-title">👤 Client Details</span><span class="badge-must">MANDATORY</span></div>
     <div class="form-grid">
-      <div class="fg"><label>Client Name *</label>     <input class="fc" id="f_clientName"      type="text"  placeholder="Full name" /></div>
-      <div class="fg"><label>Estimation No.</label>    <input class="fc" id="f_estimationNo"   type="text"  placeholder="DOC-2024-001" /></div>
-      <div class="fg"><label>Estimate Date *</label>   <input class="fc" id="f_estimateDate"   type="date" /></div>
-      <div class="fg"><label>Site Address</label>      <input class="fc" id="f_siteAddress"    type="text"  placeholder="Project address" /></div>
-      <div class="fg"><label>Mobile</label>            <input class="fc" id="f_mobile"         type="text"  placeholder="+91 XXXXXXXXXX" /></div>
-      <div class="fg"><label>Contact Number</label>    <input class="fc" id="f_contactNumber"  type="text"  placeholder="Alternate" /></div>
-      <div class="fg"><label>Email</label>             <input class="fc" id="f_email"          type="email" placeholder="client@email.com" /></div>
-      <div class="fg"><label>BDO</label>               <input class="fc" id="f_bdo"            type="text"  placeholder="Business Development Officer" /></div>
-      <div class="fg"><label>Interior Designer</label> <input class="fc" id="f_interiorDesigner" type="text" placeholder="Designer name" /></div>
-      <div class="fg"><label>Customer Care</label>     <input class="fc" id="f_customerCare"   type="text"  placeholder="+91 XXXXXXXXXX" /></div>
-      <div class="fg"><label>Prepared By</label>       <input class="fc" id="f_preparedBy"     type="text"  placeholder="Staff name" /></div>
+      <div class="fg"><label>Client Name *</label><input class="fc" id="f_clientName" type="text" placeholder="Full name"/></div>
+      <div class="fg"><label>Estimation No.</label><input class="fc" id="f_estimationNo" type="text"/></div>
+      <div class="fg"><label>Estimate Date *</label><input class="fc" id="f_estimateDate" type="date"/></div>
+      <div class="fg"><label>Site Address</label><input class="fc" id="f_siteAddress" type="text"/></div>
+      <div class="fg"><label>Mobile</label><input class="fc" id="f_mobile" type="text"/></div>
+      <div class="fg"><label>Contact Number</label><input class="fc" id="f_contactNumber" type="text"/></div>
+      <div class="fg"><label>Email</label><input class="fc" id="f_email" type="email"/></div>
+      <div class="fg"><label>BDO</label><input class="fc" id="f_bdo" type="text"/></div>
+      <div class="fg"><label>Interior Designer</label><input class="fc" id="f_interiorDesigner" type="text"/></div>
+      <div class="fg"><label>Customer Care</label><input class="fc" id="f_customerCare" type="text"/></div>
+      <div class="fg"><label>Prepared By</label><input class="fc" id="f_preparedBy" type="text"/></div>
     </div>
   </div>
 
-  <!-- TABLE TOGGLE CARD -->
   <div class="card mb">
-    <div class="card-header"><span class="card-title">📊 Select Tables</span></div>
+    <div class="card-hdr"><span class="card-title">📊 Select Tables</span></div>
     <div class="table-toggles">
       <button class="ttbtn mandatory">👤 Client (Mandatory)</button>
-      <button class="ttbtn" id="tog-catA"     onclick="APP.toggleTable('catA')">📦 Category-A</button>
-      <button class="ttbtn" id="tog-kitAcc"   onclick="APP.toggleTable('kitAcc')">🍳 Kitchen Accessories</button>
-      <button class="ttbtn" id="tog-addWorks" onclick="APP.toggleTable('addWorks')">🔧 Additional Works</button>
-      <button class="ttbtn" id="tog-catB"     onclick="APP.toggleTable('catB')">📦 Category-B</button>
-      <button class="ttbtn" id="tog-gypsum"   onclick="APP.toggleTable('gypsum')">🏠 Gypsum Ceiling</button>
+      <button class="ttbtn" id="tog-catA"     onclick="toggleTable('catA')">📦 Category-A</button>
+      <button class="ttbtn" id="tog-kitAcc"   onclick="toggleTable('kitAcc')">🍳 Kitchen Accessories</button>
+      <button class="ttbtn" id="tog-addWorks" onclick="toggleTable('addWorks')">🔧 Additional Works</button>
+      <button class="ttbtn" id="tog-catB"     onclick="toggleTable('catB')">📦 Category-B</button>
+      <button class="ttbtn" id="tog-gypsum"   onclick="toggleTable('gypsum')">🏠 Gypsum Ceiling</button>
     </div>
   </div>
 
-  <!-- ── CATEGORY-A ── -->
-  <div id="blk-catA" class="est-block hidden">
-    <div class="blk-hdr"><span>📦 CATEGORY – A</span><span class="blk-hint">SIZE_X × SIZE_Y → QTY_SQFT auto-calc</span></div>
-    <div class="blk-body">
-      <div class="tbl-scroll">
-        <table class="est-tbl">
-          <thead><tr>
-            <th>SL</th><th>Category</th><th>Item</th><th>Shutter Finish</th><th>Material</th>
-            <th>Unit</th><th>Size</th><th>Size X</th><th>Size Y</th>
-            <th>QTY SQFT</th><th>QTY</th><th>Price</th><th>Total</th><th></th>
-          </tr></thead>
-          <tbody id="tb-catA"></tbody>
-          <tfoot><tr class="tot-row">
-            <td colspan="12" class="tot-label">CATEGORY-A TOTAL</td>
-            <td id="tot-catA">₹0</td><td></td>
-          </tr></tfoot>
-        </table>
-      </div>
+  <!-- CATEGORY-A -->
+  <div id="blk-catA" class="est-block" style="display:none">
+    <div class="blk-hdr">
+      <span>📦 CATEGORY – A</span>
+      <span class="blk-hint">Select Category → Item to auto-fill fields. SIZE_X × SIZE_Y ÷ 950 = QTY SQFT</span>
     </div>
-    <button class="add-row-btn" onclick="APP.addRow('catA')">+ Add Row</button>
+    <div class="blk-body"><div class="tbl-scroll"><table class="est-tbl">
+      <thead><tr><th>SL</th><th>Category</th><th>Item</th><th>Shutter Finish</th><th>Material</th><th>Unit</th><th>Size</th><th>Size X</th><th>Size Y</th><th>QTY SQFT</th><th>QTY</th><th>Price (₹)</th><th>Total (₹)</th><th></th></tr></thead>
+      <tbody id="tb-catA"></tbody>
+      <tfoot><tr class="tot-row"><td colspan="12" class="tot-label">CATEGORY-A SUB TOTAL</td><td id="tot-catA">₹0</td><td></td></tr></tfoot>
+    </table></div></div>
+    <button class="add-row-btn" onclick="addRow('catA')">+ Add Row</button>
   </div>
 
-  <!-- ── KITCHEN ACCESSORIES ── -->
-  <div id="blk-kitAcc" class="est-block hidden">
-    <div class="blk-hdr"><span>🍳 KITCHEN ACCESSORIES</span><span class="blk-hint">Brand / Article No auto-fill on product select</span></div>
-    <div class="blk-body">
-      <div class="tbl-scroll">
-        <table class="est-tbl">
-          <thead><tr>
-            <th>SL</th><th>Product</th><th>Brand</th><th>Article No</th>
-            <th>Picture URL</th><th>QTY</th><th>Price</th><th>Total</th><th></th>
-          </tr></thead>
-          <tbody id="tb-kitAcc"></tbody>
-          <tfoot><tr class="tot-row">
-            <td colspan="6" class="tot-label">KITCHEN ACCESSORIES TOTAL</td>
-            <td id="tot-kitAcc">₹0</td><td></td><td></td>
-          </tr></tfoot>
-        </table>
-      </div>
+  <!-- KITCHEN ACCESSORIES -->
+  <div id="blk-kitAcc" class="est-block" style="display:none">
+    <div class="blk-hdr">
+      <span>🍳 KITCHEN ACCESSORIES</span>
+      <span class="blk-hint">Select Product → auto-fills Brand, Article No, Price and Picture</span>
     </div>
-    <button class="add-row-btn" onclick="APP.addRow('kitAcc')">+ Add Row</button>
+    <div class="blk-body"><div class="tbl-scroll"><table class="est-tbl">
+      <thead><tr><th>SL</th><th>Product</th><th>Brand</th><th>Article No</th><th>Picture</th><th>QTY</th><th>Price (₹)</th><th>Total (₹)</th><th></th></tr></thead>
+      <tbody id="tb-kitAcc"></tbody>
+      <tfoot><tr class="tot-row"><td colspan="6" class="tot-label">KITCHEN ACCESSORIES SUB TOTAL</td><td id="tot-kitAcc">₹0</td><td></td><td></td></tr></tfoot>
+    </table></div></div>
+    <button class="add-row-btn" onclick="addRow('kitAcc')">+ Add Row</button>
   </div>
 
-  <!-- ── ADDITIONAL WORKS ── -->
-  <div id="blk-addWorks" class="est-block hidden">
+  <!-- ADDITIONAL WORKS -->
+  <div id="blk-addWorks" class="est-block" style="display:none">
     <div class="blk-hdr"><span>🔧 ADDITIONAL WORKS</span></div>
-    <div class="blk-body">
-      <div class="tbl-scroll">
-        <table class="est-tbl">
-          <thead><tr>
-            <th>SL</th><th>Category</th><th>Item</th><th>Shutter Finish</th>
-            <th>Material</th><th>Unit</th><th>Size</th><th>QTY</th><th>Price</th><th>Total</th><th></th>
-          </tr></thead>
-          <tbody id="tb-addWorks"></tbody>
-          <tfoot><tr class="tot-row">
-            <td colspan="8" class="tot-label">ADDITIONAL WORKS TOTAL</td>
-            <td id="tot-addWorks">₹0</td><td></td><td></td>
-          </tr></tfoot>
-        </table>
-      </div>
-    </div>
-    <button class="add-row-btn" onclick="APP.addRow('addWorks')">+ Add Row</button>
+    <div class="blk-body"><div class="tbl-scroll"><table class="est-tbl">
+      <thead><tr><th>SL</th><th>Category</th><th>Item</th><th>Shutter Finish</th><th>Material</th><th>Unit</th><th>Size</th><th>QTY</th><th>Price (₹)</th><th>Total (₹)</th><th></th></tr></thead>
+      <tbody id="tb-addWorks"></tbody>
+      <tfoot><tr class="tot-row"><td colspan="8" class="tot-label">ADDITIONAL WORKS SUB TOTAL</td><td id="tot-addWorks">₹0</td><td></td><td></td></tr></tfoot>
+    </table></div></div>
+    <button class="add-row-btn" onclick="addRow('addWorks')">+ Add Row</button>
   </div>
 
-  <!-- ── CATEGORY-B ── -->
-  <div id="blk-catB" class="est-block hidden">
+  <!-- CATEGORY-B -->
+  <div id="blk-catB" class="est-block" style="display:none">
     <div class="blk-hdr"><span>📦 CATEGORY – B</span></div>
-    <div class="blk-body">
-      <div class="tbl-scroll">
-        <table class="est-tbl">
-          <thead><tr>
-            <th>SL</th><th>Category</th><th>Item</th><th>Shutter Finish</th>
-            <th>Material</th><th>Unit</th><th>Size</th><th>QTY</th><th>Price</th><th>Total</th><th></th>
-          </tr></thead>
-          <tbody id="tb-catB"></tbody>
-          <tfoot><tr class="tot-row">
-            <td colspan="8" class="tot-label">CATEGORY-B TOTAL</td>
-            <td id="tot-catB">₹0</td><td></td><td></td>
-          </tr></tfoot>
-        </table>
-      </div>
-    </div>
-    <button class="add-row-btn" onclick="APP.addRow('catB')">+ Add Row</button>
+    <div class="blk-body"><div class="tbl-scroll"><table class="est-tbl">
+      <thead><tr><th>SL</th><th>Category</th><th>Item</th><th>Shutter Finish</th><th>Material</th><th>Unit</th><th>Size</th><th>QTY</th><th>Price (₹)</th><th>Total (₹)</th><th></th></tr></thead>
+      <tbody id="tb-catB"></tbody>
+      <tfoot><tr class="tot-row"><td colspan="8" class="tot-label">CATEGORY-B SUB TOTAL</td><td id="tot-catB">₹0</td><td></td><td></td></tr></tfoot>
+    </table></div></div>
+    <button class="add-row-btn" onclick="addRow('catB')">+ Add Row</button>
   </div>
 
-  <!-- ── GYPSUM CEILING ── -->
-  <div id="blk-gypsum" class="est-block hidden">
+  <!-- GYPSUM CEILING -->
+  <div id="blk-gypsum" class="est-block" style="display:none">
     <div class="blk-hdr"><span>🏠 GYPSUM CEILING WORK</span></div>
-    <div class="blk-body">
-      <div class="tbl-scroll">
-        <table class="est-tbl">
-          <thead><tr>
-            <th>SL</th><th>Category</th><th>Item</th><th>Finish</th>
-            <th>Material</th><th>Unit</th><th>Size</th><th>Price</th><th>Total</th><th></th>
-          </tr></thead>
-          <tbody id="tb-gypsum"></tbody>
-          <tfoot><tr class="tot-row">
-            <td colspan="7" class="tot-label">GYPSUM CEILING TOTAL</td>
-            <td id="tot-gypsum">₹0</td><td></td><td></td>
-          </tr></tfoot>
-        </table>
-      </div>
-    </div>
-    <button class="add-row-btn" onclick="APP.addRow('gypsum')">+ Add Row</button>
+    <div class="blk-body"><div class="tbl-scroll"><table class="est-tbl">
+      <thead><tr><th>SL</th><th>Category</th><th>Item</th><th>Finish</th><th>Material</th><th>Unit</th><th>Size</th><th>Price (₹)</th><th>Total (₹)</th><th></th></tr></thead>
+      <tbody id="tb-gypsum"></tbody>
+      <tfoot><tr class="tot-row"><td colspan="7" class="tot-label">GYPSUM CEILING SUB TOTAL</td><td id="tot-gypsum">₹0</td><td></td><td></td></tr></tfoot>
+    </table></div></div>
+    <button class="add-row-btn" onclick="addRow('gypsum')">+ Add Row</button>
   </div>
 
-  <!-- GRAND TOTAL -->
   <div class="grand-total-bar">
-    <div>
-      <div class="gt-label">Grand Total</div>
-      <div class="gt-sub">Sum of all active table sub-totals</div>
-    </div>
+    <div><div class="gt-label">Grand Total</div><div class="gt-sub">Sum of all active table sub-totals</div></div>
     <div class="gt-value" id="grandTotal">₹0</div>
   </div>
+</div>
 
-</section>
-
-<!-- ══════════════════════════════════
-     SCREEN 3 – PREVIEW
-     ══════════════════════════════════ -->
-<section id="screen-preview" class="screen hidden">
-  <div class="screen-header">
-    <div>
-      <h2>👁 Estimate Preview</h2>
-      <p class="sub">A4 document preview — use Print to export as PDF</p>
-    </div>
-    <div class="hdr-actions">
-      <button class="btn btn-outline" onclick="APP.showScreen('edit')">← Back to Edit</button>
+<!-- SCREEN 3: PREVIEW -->
+<div id="screen-preview" class="screen">
+  <div class="screen-hdr">
+    <div><h2>👁 Estimate Preview</h2><p class="sub">A4 layout — Print to export as PDF</p></div>
+    <div class="hdr-btns">
+      <button class="btn btn-outline" onclick="showScreen('edit')">← Back</button>
       <button class="btn btn-primary" onclick="window.print()">🖨 Print / PDF</button>
     </div>
   </div>
   <div id="previewWrap" class="preview-wrap">
-    <div class="preview-placeholder">Open or create an estimate to see the A4 preview.</div>
-  </div>
-</section>
-
-<!-- ══════════════════════════════════
-     SCREEN 4 – ADMIN
-     ══════════════════════════════════ -->
-<section id="screen-admin" class="screen hidden">
-  <div class="screen-header">
-    <div>
-      <h2>⚙️ Admin – Dropdown Management</h2>
-      <p class="sub">Add, edit or delete values that appear in the dropdowns</p>
-    </div>
-    <button class="btn btn-primary" onclick="APP.showAddModal()">+ Add Item</button>
-  </div>
-
-  <div class="admin-tabs" id="adminTabs">
-    <button class="atab active" id="atab-catA"          onclick="APP.switchAdminTab('catA')">Category-A</button>
-    <button class="atab"        id="atab-catB"          onclick="APP.switchAdminTab('catB')">Category-B</button>
-    <button class="atab"        id="atab-additionalWorks" onclick="APP.switchAdminTab('additionalWorks')">Additional Works</button>
-    <button class="atab"        id="atab-gypsum"        onclick="APP.switchAdminTab('gypsum')">Gypsum</button>
-    <button class="atab"        id="atab-kitchenAcc"    onclick="APP.switchAdminTab('kitchenAcc')">Kitchen Accessories</button>
-  </div>
-
-  <div class="card">
-    <div id="adminContent" class="table-scroll"><div class="empty">Loading…</div></div>
-  </div>
-</section>
-
-<!-- ══════════════════════════════════
-     MODALS
-     ══════════════════════════════════ -->
-
-<!-- Delete estimate -->
-<div id="delModal" class="modal-overlay hidden">
-  <div class="modal">
-    <h3>🗑 Delete Estimate?</h3>
-    <p>This cannot be undone.</p>
-    <div class="modal-actions">
-      <button class="btn btn-outline" onclick="APP.closeModal('delModal')">Cancel</button>
-      <button class="btn btn-danger"  onclick="APP.confirmDelete()">Delete</button>
-    </div>
+    <div class="preview-ph">Open or create an estimate to see the A4 preview.</div>
   </div>
 </div>
 
-<!-- Admin add/edit -->
-<div id="addModal" class="modal-overlay hidden">
-  <div class="modal" style="max-width:520px">
-    <h3 id="addModalTitle">Add New Item</h3>
+<!-- SCREEN 4: ADMIN -->
+<div id="screen-admin" class="screen">
+  <div class="screen-hdr">
+    <div><h2>⚙️ Admin – Dropdown Management</h2><p class="sub">Add, edit or delete dropdown values</p></div>
+    <button class="btn btn-primary" onclick="showAddModal()">+ Add Item</button>
+  </div>
+  <div class="admin-tabs">
+    <button class="atab active" id="atab-catA"            onclick="switchAdminTab('catA')">Category-A</button>
+    <button class="atab"        id="atab-catB"            onclick="switchAdminTab('catB')">Category-B</button>
+    <button class="atab"        id="atab-additionalWorks" onclick="switchAdminTab('additionalWorks')">Additional Works</button>
+    <button class="atab"        id="atab-gypsum"          onclick="switchAdminTab('gypsum')">Gypsum</button>
+    <button class="atab"        id="atab-kitchenAcc"      onclick="switchAdminTab('kitchenAcc')">Kitchen Accessories</button>
+  </div>
+  <div class="card"><div id="adminContent" class="tbl-scroll"><div class="empty">Loading…</div></div></div>
+</div>
+
+<!-- MODALS -->
+<div id="delModal" class="modal-overlay">
+  <div class="modal"><h3>🗑 Delete Estimate?</h3><p>This cannot be undone.</p>
+    <div class="modal-actions"><button class="btn btn-outline" onclick="closeModal('delModal')">Cancel</button><button class="btn btn-danger" onclick="confirmDelete()">Delete</button></div>
+  </div>
+</div>
+<div id="addModal" class="modal-overlay">
+  <div class="modal" style="max-width:520px"><h3 id="addModalTitle">Add New Item</h3>
     <div id="addModalFields" class="modal-fields"></div>
-    <div class="modal-actions">
-      <button class="btn btn-outline" onclick="APP.closeModal('addModal')">Cancel</button>
-      <button class="btn btn-primary" id="addModalSubmit" onclick="APP.submitModal()">Add Item</button>
-    </div>
+    <div class="modal-actions"><button class="btn btn-outline" onclick="closeModal('addModal')">Cancel</button><button class="btn btn-primary" id="addModalSubmit" onclick="submitModal()">Add Item</button></div>
+  </div>
+</div>
+<div id="adminDelModal" class="modal-overlay">
+  <div class="modal"><h3>🗑 Delete Item?</h3><p>Removes the option from all menus.</p>
+    <div class="modal-actions"><button class="btn btn-outline" onclick="closeModal('adminDelModal')">Cancel</button><button class="btn btn-danger" onclick="confirmAdminDelete()">Delete</button></div>
   </div>
 </div>
 
-<!-- Admin delete -->
-<div id="adminDelModal" class="modal-overlay hidden">
-  <div class="modal">
-    <h3>🗑 Delete Dropdown Item?</h3>
-    <p>This removes the option from all dropdown menus.</p>
-    <div class="modal-actions">
-      <button class="btn btn-outline" onclick="APP.closeModal('adminDelModal')">Cancel</button>
-      <button class="btn btn-danger"  onclick="APP.confirmAdminDelete()">Delete</button>
-    </div>
-  </div>
-</div>
+<script>
+// ════════════════════════════════════════════════════════════════
+//  DOC INTERIORS APP — index.html
+//  Preview uses preview-template.html (loaded once via fetch)
+//  with {{VARIABLE}} placeholders replaced at render time.
+// ════════════════════════════════════════════════════════════════
 
-<script src="js/app.js"></script>
+var GAS_KEY = 'doc_gas_url';
+var SS_ID_KEY = 'doc_ss_id';
+var SS_URL_KEY = 'doc_ss_url';
+var PREVIEW_TPL_KEY = 'doc_preview_tpl';  // cached template string
+
+var S = {
+  estimates: [],
+  dropdowns: { catA:[], catB:[], additionalWorks:[], gypsum:[], kitchenAcc:[] },
+  adminData: {},
+  currentId: null, delId: null,
+  adminTab: 'catA', adminDel: null, modalEdit: null,
+  active: { catA:false, kitAcc:false, addWorks:false, catB:false, gypsum:false },
+  rows:   { catA:[], kitAcc:[], addWorks:[], catB:[], gypsum:[] },
+  previewTemplate: null   // cached template HTML
+};
+
+// ── Utils ─────────────────────────────────────────────────────────────────────
+function gasUrl() { return localStorage.getItem(GAS_KEY) || ''; }
+function h(s) {
+  // Safe HTML escape — never use entity codes in JS strings, use real UTF-8
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function fmt(n) { return Number(n||0).toLocaleString('en-IN', {maximumFractionDigits:0}); }
+function uniq(arr, k) { return [...new Set((arr||[]).map(function(r){return r[k];}).filter(Boolean))]; }
+function gv(id) { var el = document.getElementById(id); return el ? el.value.trim() : ''; }
+
+function toast(msg, type) {
+  var el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast show' + (type ? ' ' + type : '');
+  clearTimeout(toast._t);
+  toast._t = setTimeout(function(){ el.className = 'toast'; }, 3500);
+}
+function loading(on) {
+  document.getElementById('loading').className = 'loading-overlay' + (on ? ' show' : '');
+}
+function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+// ── Dropdown select builder — uses real characters NOT entities ────────────────
+function sel(opts, cur, fn, w) {
+  var o = '<option value="">— Select —</option>';
+  opts.forEach(function(v) {
+    o += '<option value="' + h(v) + '"' + (v === cur ? ' selected' : '') + '>' + h(v) + '</option>';
+  });
+  return '<select class="ts"' + (w ? ' style="' + w + '"' : '') + ' onchange="' + fn + '">' + o + '</select>';
+}
+
+// ── API ────────────────────────────────────────────────────────────────────────
+function gasGet(action, params) {
+  var url = gasUrl();
+  if (!url) { toast('GAS URL not set', 'err'); return Promise.reject('no url'); }
+  var u = new URL(url);
+  u.searchParams.set('action', action);
+  if (params) Object.keys(params).forEach(function(k){ u.searchParams.set(k, params[k]); });
+  return fetch(u.toString())
+    .then(function(r){ return r.json(); })
+    .then(function(j){ if (!j.ok) throw new Error(j.error || 'GAS error'); return j.data; });
+}
+
+function gasPost(action, payload) {
+  var url = gasUrl();
+  if (!url) { toast('GAS URL not set', 'err'); return Promise.reject('no url'); }
+  return fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify({ action: action, payload: payload || {} })
+  }).then(function(r){ return r.json(); })
+    .then(function(j){ if (!j.ok) throw new Error(j.error || 'GAS error'); return j; });
+}
+
+// ── Config ─────────────────────────────────────────────────────────────────────
+function saveGasUrl() {
+  var v = document.getElementById('gasUrlInput').value.trim();
+  if (!v.startsWith('https://script.google.com')) { toast('Enter a valid GAS Web App URL', 'err'); return; }
+  localStorage.setItem(GAS_KEY, v);
+  loading(true);
+  gasGet('getConfig')
+    .then(function(cfg) {
+      localStorage.setItem(SS_ID_KEY, cfg.spreadsheetId);
+      localStorage.setItem(SS_URL_KEY, cfg.spreadsheetUrl);
+      document.getElementById('configBanner').style.display = 'none';
+      showStatusBar(cfg.spreadsheetId, cfg.spreadsheetUrl);
+      toast('Connected! Spreadsheet ID received ✓', 'ok');
+      return init();
+    })
+    .catch(function(e) { toast('Connection failed: ' + e.message, 'err'); })
+    .finally(function() { loading(false); });
+}
+
+function toggleConfig() {
+  var b = document.getElementById('configBanner');
+  b.style.display = (b.style.display === 'none' || b.style.display === '') ? 'block' : 'none';
+  if (b.style.display === 'block') document.getElementById('gasUrlInput').value = gasUrl();
+}
+
+function showStatusBar(ssId, ssUrl) {
+  var bar = document.getElementById('statusBar');
+  if (ssId && ssId !== 'PASTE_YOUR_SPREADSHEET_ID_HERE') {
+    bar.innerHTML = '📊 Connected: <a href="' + ssUrl + '" target="_blank">' + ssId.slice(0,30) + '…</a>';
+    bar.style.display = 'block';
+  }
+}
+
+// ── Screen router ──────────────────────────────────────────────────────────────
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(function(s) { s.style.display = 'none'; s.classList.remove('active'); });
+  document.querySelectorAll('.nav-tab').forEach(function(t) { t.classList.remove('active'); });
+  var scr = document.getElementById('screen-' + name);
+  scr.style.display = 'block'; scr.classList.add('active');
+  var tabs = document.querySelectorAll('.nav-tab');
+  var map = { entries:0, edit:1, preview:2, admin:3 };
+  if (map[name] !== undefined) tabs[map[name]].classList.add('active');
+  if (name === 'preview') renderPreview();
+  if (name === 'admin')   loadAdminData();
+  if (name === 'entries') loadEntries();
+}
+
+// ── Init ───────────────────────────────────────────────────────────────────────
+function init() {
+  loading(true);
+  return Promise.all([gasGet('getDropdownData'), gasGet('getAllEstimates')])
+    .then(function(r) {
+      S.dropdowns = r[0] || { catA:[], catB:[], additionalWorks:[], gypsum:[], kitchenAcc:[] };
+      S.estimates = r[1] || [];
+      renderEntries(S.estimates);
+    })
+    .catch(function(e) { toast('Init error: ' + e.message, 'err'); })
+    .finally(function() { loading(false); });
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  SCREEN 1 – ENTRIES
+// ══════════════════════════════════════════════════════════════════
+function loadEntries() {
+  loading(true);
+  gasGet('getAllEstimates')
+    .then(function(d) { S.estimates = d || []; renderEntries(S.estimates); })
+    .catch(function(e) { toast('Load error: ' + e.message, 'err'); })
+    .finally(function() { loading(false); });
+}
+
+function renderEntries(list) {
+  var tb = document.getElementById('entriesBody');
+  if (!list || !list.length) {
+    tb.innerHTML = '<tr><td colspan="9" class="empty">No estimates yet. <a href="#" onclick="startNew()">Create first →</a></td></tr>';
+    return;
+  }
+  tb.innerHTML = list.map(function(e, i) {
+    return '<tr>' +
+      '<td style="color:var(--muted);font-size:11px">' + (i+1) + '</td>' +
+      '<td><strong>' + h(e.estimationNo || e.id) + '</strong></td>' +
+      '<td>' + h(e.clientName || '—') + '</td>' +
+      '<td style="color:var(--muted);font-size:12px">' + h(e.siteAddress || '—') + '</td>' +
+      '<td>' + h(e.mobile || '—') + '</td>' +
+      '<td>' + h(e.estimateDate || fmtDate(e.dateCreated)) + '</td>' +
+      '<td>' + h(e.preparedBy || '—') + '</td>' +
+      '<td><span class="badge-active">Active</span></td>' +
+      '<td style="white-space:nowrap">' +
+        '<button class="btn btn-outline btn-sm" onclick="editEstimate(\'' + e.id + '\')">✏️ Edit</button> ' +
+        '<button class="btn btn-outline btn-sm" onclick="previewById(\'' + e.id + '\')">👁 View</button> ' +
+        '<button class="btn btn-danger btn-sm" onclick="showDelModal(\'' + e.id + '\')">🗑</button>' +
+      '</td></tr>';
+  }).join('');
+}
+
+function filterEntries() {
+  var q = document.getElementById('searchInput').value.toLowerCase();
+  renderEntries(S.estimates.filter(function(e) {
+    return (e.clientName||''  ).toLowerCase().includes(q) ||
+           (e.estimationNo||''  ).toLowerCase().includes(q) ||
+           (e.siteAddress||''  ).toLowerCase().includes(q);
+  }));
+}
+function fmtDate(d) { if (!d) return '—'; try { return new Date(d).toLocaleDateString('en-IN'); } catch(e) { return d; } }
+function showDelModal(id) { S.delId = id; document.getElementById('delModal').style.display = 'flex'; }
+function confirmDelete() {
+  if (!S.delId) return;
+  loading(true);
+  gasPost('deleteEstimate', { id: S.delId })
+    .then(function() { closeModal('delModal'); toast('Deleted', 'ok'); loadEntries(); })
+    .catch(function(e) { toast('Delete failed: ' + e.message, 'err'); })
+    .finally(function() { loading(false); S.delId = null; });
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  SCREEN 2 – EDIT / NEW
+// ══════════════════════════════════════════════════════════════════
+function startNew() {
+  S.currentId = null;
+  clearForm();
+  document.getElementById('editTitle').textContent = '✏️ New Estimate';
+  document.getElementById('editSub').textContent   = 'Fill client details and select tables';
+  document.getElementById('f_estimateDate').value  = new Date().toISOString().split('T')[0];
+  document.getElementById('f_estimationNo').value  = 'DOC-' + Date.now().toString().slice(-6);
+  if (!S.dropdowns.catA || !S.dropdowns.catA.length) {
+    loading(true);
+    gasGet('getDropdownData')
+      .then(function(d) { S.dropdowns = d || { catA:[], catB:[], additionalWorks:[], gypsum:[], kitchenAcc:[] }; })
+      .catch(function() {})
+      .finally(function() { loading(false); showScreen('edit'); });
+  } else {
+    showScreen('edit');
+  }
+}
+
+function editEstimate(id) {
+  var est = S.estimates.find(function(e) { return e.id === id; });
+  if (!est) { toast('Not found', 'err'); return; }
+  S.currentId = id;
+  document.getElementById('editTitle').textContent = '✏️ Edit: ' + (est.estimationNo || id);
+  document.getElementById('editSub').textContent   = 'Client: ' + (est.clientName || '');
+  ['clientName','estimationNo','estimateDate','siteAddress','mobile','contactNumber','email','bdo','interiorDesigner','customerCare','preparedBy']
+    .forEach(function(k) { var el = document.getElementById('f_' + k); if (el) el.value = est[k] || ''; });
+  var tables = est.data || {};
+  Object.keys(S.active).forEach(function(k) {
+    S.active[k] = !!(tables[k] && tables[k].length);
+    S.rows[k]   = tables[k] || [];
+    togTable(k, S.active[k]);
+  });
+  renderAll();
+  showScreen('edit');
+}
+
+function clearForm() {
+  ['clientName','estimationNo','estimateDate','siteAddress','mobile','contactNumber','email','bdo','interiorDesigner','customerCare','preparedBy']
+    .forEach(function(f) { var el = document.getElementById('f_' + f); if (el) el.value = ''; });
+  Object.keys(S.active).forEach(function(k) { S.active[k] = false; S.rows[k] = []; togTable(k, false); });
+  updateGrand();
+}
+
+function togTable(key, on) {
+  var btn = document.getElementById('tog-' + key);
+  var blk = document.getElementById('blk-' + key);
+  if (btn) btn.classList.toggle('on', on);
+  if (blk) blk.style.display = on ? 'block' : 'none';
+}
+
+function toggleTable(key) {
+  S.active[key] = !S.active[key];
+  togTable(key, S.active[key]);
+  if (S.active[key] && !S.rows[key].length) addRow(key);
+  updateGrand();
+}
+
+// ── Blank row factories ────────────────────────────────────────────────────────
+var BLANK = {
+  catA    : function() { return { category:'', item:'', shutterFinish:'', material:'', unit:'', size:'', sizeX:'', sizeY:'', qtySqft:0, qty:'', price:'', total:0 }; },
+  kitAcc  : function() { return { product:'', brand:'', articleNo:'', pictureUrl:'', qty:'', price:'', total:0 }; },
+  addWorks: function() { return { category:'', item:'', shutterFinish:'', material:'', unit:'', size:'', qty:'', price:'', total:0 }; },
+  catB    : function() { return { category:'', item:'', shutterFinish:'', material:'', unit:'', size:'', qty:'', price:'', total:0 }; },
+  gypsum  : function() { return { category:'', item:'', finish:'', material:'', unit:'', size:'', price:'', total:0 }; }
+};
+
+function addRow(key) { S.rows[key].push(BLANK[key]()); renderTable(key); }
+function delRow(key, i) { S.rows[key].splice(i, 1); renderTable(key); updateGrand(); }
+function renderAll() { ['catA','kitAcc','addWorks','catB','gypsum'].forEach(renderTable); }
+function renderTable(key) {
+  switch(key) {
+    case 'catA':     renderCatA();           break;
+    case 'kitAcc':   renderKitAcc();         break;
+    case 'addWorks': renderSimple('addWorks'); break;
+    case 'catB':     renderSimple('catB');   break;
+    case 'gypsum':   renderGypsum();         break;
+  }
+  updateTot(key);
+}
+
+// ── Category-A ─────────────────────────────────────────────────────────────────
+function renderCatA() {
+  var dd = S.dropdowns.catA || [];
+  var cats = uniq(dd, 'category');
+  document.getElementById('tb-catA').innerHTML = S.rows.catA.map(function(r, i) {
+    var items = uniq(dd.filter(function(d) { return !r.category || d.category === r.category; }), 'item');
+    return '<tr>' +
+      '<td>' + (i+1) + '</td>' +
+      '<td>' + sel(cats, r.category, 'setCatA('+i+',"category",this.value)') + '</td>' +
+      '<td>' + sel(items, r.item, 'setCatA('+i+',"item",this.value)') + '</td>' +
+      '<td style="font-size:11px;color:var(--text);padding:4px 6px">' + h(r.shutterFinish || '—') + '</td>' +
+      '<td style="font-size:11px;color:var(--text);padding:4px 6px">' + h(r.material || '—') + '</td>' +
+      '<td style="font-size:11px;color:var(--text);padding:4px 6px">' + h(r.unit || '—') + '</td>' +
+      '<td><input class="ti" type="text" value="' + h(r.size) + '" oninput="setCatA('+i+',\'size\',this.value)" style="width:90px" placeholder="e.g.150x235"></td>' +
+      '<td><input class="ti" type="text" inputmode="decimal" value="' + (r.sizeX||''  ) + '" oninput="setCatA('+i+',\'sizeX\',this.value)" style="width:58px" placeholder="0"></td>' +
+      '<td><input class="ti" type="text" inputmode="decimal" value="' + (r.sizeY||''  ) + '" oninput="setCatA('+i+',\'sizeY\',this.value)" style="width:58px" placeholder="0"></td>' +
+      '<td><span class="computed">' + (r.qtySqft||0) + '</span></td>' +
+      '<td><input class="ti" type="text" inputmode="decimal" value="' + (r.qty||''  ) + '" oninput="setCatA('+i+',\'qty\',this.value)" style="width:52px" placeholder="0"></td>' +
+      '<td><input class="ti" type="text" inputmode="decimal" value="' + (r.price||''  ) + '" oninput="setCatA('+i+',\'price\',this.value)" style="width:72px" placeholder="0"></td>' +
+      '<td><span class="computed">₹' + fmt(r.total||0) + '</span></td>' +
+      '<td><button class="btn-del-row" onclick="delRow(\'catA\','+i+')">✕</button></td>' +
+    '</tr>';
+  }).join('');
+}
+
+function setCatA(i, f, v) {
+  var r = S.rows.catA[i];
+  r[f] = v;
+  // Clear dependent fields when category changes
+  if (f === 'category') { r.item = ''; r.shutterFinish = ''; r.material = ''; r.unit = ''; r.price = ''; }
+  // Auto-fill all fields when item is selected
+  if (f === 'item' && v) {
+    var m = (S.dropdowns.catA || []).find(function(d) { return d.item === v && (!r.category || d.category === r.category); });
+    if (m) {
+      r.shutterFinish = m.shutterFinish || '';
+      r.material      = m.material      || '';
+      r.unit          = m.unit          || '';
+      r.price         = m.defaultPrice  || '';
+    }
+  }
+  // Recalculate QTY_SQFT and Total
+  var sx = parseFloat(r.sizeX) || 0;
+  var sy = parseFloat(r.sizeY) || 0;
+  r.qtySqft = (sx && sy) ? Math.round((sx * sy) / 950) : 0;
+  var price = parseFloat(r.price) || 0;
+  var qty   = parseFloat(r.qty)   || 0;
+  r.total   = r.qtySqft > 0 ? r.qtySqft * price : qty * price;
+  renderCatA();
+  updateTot('catA');
+}
+
+// ── Kitchen Accessories ─────────────────────────────────────────────────────────
+function renderKitAcc() {
+  var dd    = S.dropdowns.kitchenAcc || [];
+  var prods = uniq(dd, 'product');
+  document.getElementById('tb-kitAcc').innerHTML = S.rows.kitAcc.map(function(r, i) {
+    var picHtml = r.pictureUrl
+      ? '<img src="' + h(r.pictureUrl) + '" style="width:44px;height:44px;object-fit:cover;border-radius:4px;border:1px solid var(--border)" onerror="this.style.display=\'none\'">' 
+      : '<div style="width:44px;height:44px;background:var(--gold-lt);border-radius:4px;border:1px dashed var(--gold);display:flex;align-items:center;justify-content:center;font-size:16px">🖼</div>';
+    return '<tr>' +
+      '<td>' + (i+1) + '</td>' +
+      '<td>' + sel(prods, r.product, 'setKit('+i+',"product",this.value)', 'min-width:160px') + '</td>' +
+      '<td style="font-size:11px">' + h(r.brand || '—') + '</td>' +
+      '<td style="font-size:11px">' + h(r.articleNo || '—') + '</td>' +
+      '<td>' + picHtml + '</td>' +
+      '<td><input class="ti" type="text" inputmode="decimal" value="' + (r.qty||''  ) + '" oninput="setKit('+i+',\'qty\',this.value)" style="width:52px" placeholder="0"></td>' +
+      '<td><input class="ti" type="text" inputmode="decimal" value="' + (r.price||''  ) + '" oninput="setKit('+i+',\'price\',this.value)" style="width:75px" placeholder="0"></td>' +
+      '<td><span class="computed">₹' + fmt(r.total||0) + '</span></td>' +
+      '<td><button class="btn-del-row" onclick="delRow(\'kitAcc\','+i+')">✕</button></td>' +
+    '</tr>';
+  }).join('');
+}
+
+function setKit(i, f, v) {
+  var r = S.rows.kitAcc[i];
+  r[f] = v;
+  if (f === 'product') {
+    var m = (S.dropdowns.kitchenAcc || []).find(function(d) { return d.product === v; });
+    if (m) { r.brand = m.brand||''  ; r.articleNo = m.articleNo||''  ; r.pictureUrl = m.pictureUrl||''  ; r.price = m.defaultPrice||''  ; }
+  }
+  r.total = (parseFloat(r.qty)||0) * (parseFloat(r.price)||0);
+  renderKitAcc();
+  updateTot('kitAcc');
+}
+
+// ── Simple tables (addWorks / catB) ────────────────────────────────────────────
+function renderSimple(key) {
+  var ddKey = key === 'addWorks' ? 'additionalWorks' : 'catB';
+  var dd    = S.dropdowns[ddKey] || [];
+  var cats  = uniq(dd, 'category');
+  var shts  = uniq(dd, 'shutterFinish');
+  var mats  = uniq(dd, 'material');
+  var uts   = uniq(dd, 'unit');
+  document.getElementById('tb-' + key).innerHTML = S.rows[key].map(function(r, i) {
+    var items = uniq(dd.filter(function(d) { return !r.category || d.category === r.category; }), 'item');
+    return '<tr>' +
+      '<td>' + (i+1) + '</td>' +
+      '<td>' + sel(cats, r.category, 'setSimple("'+key+'",'+i+',"category",this.value)') + '</td>' +
+      '<td>' + sel(items, r.item,    'setSimple("'+key+'",'+i+',"item",this.value)') + '</td>' +
+      '<td>' + sel(shts, r.shutterFinish, 'setSimple("'+key+'",'+i+',"shutterFinish",this.value)') + '</td>' +
+      '<td>' + sel(mats, r.material,      'setSimple("'+key+'",'+i+',"material",this.value)') + '</td>' +
+      '<td>' + sel(uts,  r.unit,          'setSimple("'+key+'",'+i+',"unit",this.value)', 'width:70px') + '</td>' +
+      '<td><input class="ti" type="text" value="' + h(r.size) + '" oninput="setSimple(\''  +key+'\','+i+',\'size\',this.value)" style="width:90px" placeholder="free text"></td>' +
+      '<td><input class="ti" type="text" inputmode="decimal" value="' + (r.qty||''  ) + '" oninput="setSimple(\''  +key+'\','+i+',\'qty\',this.value)" style="width:58px" placeholder="0"></td>' +
+      '<td><input class="ti" type="text" inputmode="decimal" value="' + (r.price||''  ) + '" oninput="setSimple(\''  +key+'\','+i+',\'price\',this.value)" style="width:75px" placeholder="0"></td>' +
+      '<td><span class="computed">₹' + fmt(r.total||0) + '</span></td>' +
+      '<td><button class="btn-del-row" onclick="delRow(\''  +key+'\','+i+')">✕</button></td>' +
+    '</tr>';
+  }).join('');
+}
+
+function setSimple(key, i, f, v) {
+  var ddKey = key === 'addWorks' ? 'additionalWorks' : 'catB';
+  var r = S.rows[key][i];
+  r[f] = v;
+  if (f === 'category') r.item = '';
+  if (f === 'item' && v) {
+    var m = (S.dropdowns[ddKey] || []).find(function(d) { return d.item === v; });
+    if (m && !parseFloat(r.price)) r.price = m.defaultPrice || '';
+  }
+  r.total = (parseFloat(r.qty)||0) * (parseFloat(r.price)||0);
+  renderSimple(key);
+  updateTot(key);
+}
+
+// ── Gypsum ─────────────────────────────────────────────────────────────────────
+function renderGypsum() {
+  var dd   = S.dropdowns.gypsum || [];
+  var cats = uniq(dd, 'category');
+  var fins = uniq(dd, 'finish');
+  var mats = uniq(dd, 'material');
+  var uts  = uniq(dd, 'unit');
+  document.getElementById('tb-gypsum').innerHTML = S.rows.gypsum.map(function(r, i) {
+    var items = uniq(dd.filter(function(d) { return !r.category || d.category === r.category; }), 'item');
+    return '<tr>' +
+      '<td>' + (i+1) + '</td>' +
+      '<td>' + sel(cats, r.category, 'setGypsum('+i+',"category",this.value)') + '</td>' +
+      '<td>' + sel(items, r.item,    'setGypsum('+i+',"item",this.value)') + '</td>' +
+      '<td>' + sel(fins,  r.finish,  'setGypsum('+i+',"finish",this.value)') + '</td>' +
+      '<td>' + sel(mats,  r.material,'setGypsum('+i+',"material",this.value)') + '</td>' +
+      '<td>' + sel(uts,   r.unit,    'setGypsum('+i+',"unit",this.value)', 'width:70px') + '</td>' +
+      '<td><input class="ti" type="text" value="' + h(r.size) + '" oninput="setGypsum('+i+',\'size\',this.value)" style="width:90px" placeholder="free text"></td>' +
+      '<td><input class="ti" type="text" inputmode="decimal" value="' + (r.price||''  ) + '" oninput="setGypsum('+i+',\'price\',this.value)" style="width:75px" placeholder="0"></td>' +
+      '<td><span class="computed">₹' + fmt(r.total||0) + '</span></td>' +
+      '<td><button class="btn-del-row" onclick="delRow(\'gypsum\','+i+')">✕</button></td>' +
+    '</tr>';
+  }).join('');
+}
+
+function setGypsum(i, f, v) {
+  var r = S.rows.gypsum[i];
+  r[f] = v;
+  if (f === 'category') r.item = '';
+  if (f === 'item' && v) {
+    var m = (S.dropdowns.gypsum || []).find(function(d) { return d.item === v; });
+    if (m) r.price = m.defaultPrice || '';
+  }
+  r.total = parseFloat(r.price) || 0;
+  renderGypsum();
+  updateTot('gypsum');
+}
+
+// ── Totals ─────────────────────────────────────────────────────────────────────
+function updateTot(key) {
+  var tot = S.rows[key].reduce(function(s, r) { return s + (parseFloat(r.total)||0); }, 0);
+  var el  = document.getElementById('tot-' + key);
+  if (el) el.textContent = '₹' + fmt(tot);
+  updateGrand();
+}
+
+function updateGrand() {
+  var g = 0;
+  Object.keys(S.active).forEach(function(k) {
+    if (S.active[k]) g += S.rows[k].reduce(function(s, r) { return s + (parseFloat(r.total)||0); }, 0);
+  });
+  document.getElementById('grandTotal').textContent = '₹' + fmt(g);
+}
+
+// ── Save Estimate ──────────────────────────────────────────────────────────────
+function saveEstimate() {
+  var name = gv('f_clientName');
+  if (!name) { toast('Client name is required', 'err'); return; }
+  var payload = {
+    id: S.currentId,
+    client: {
+      clientName:       name,
+      estimationNo:     gv('f_estimationNo'),
+      estimateDate:     gv('f_estimateDate'),
+      siteAddress:      gv('f_siteAddress'),
+      mobile:           gv('f_mobile'),
+      contactNumber:    gv('f_contactNumber'),
+      email:            gv('f_email'),
+      bdo:              gv('f_bdo'),
+      interiorDesigner: gv('f_interiorDesigner'),
+      customerCare:     gv('f_customerCare'),
+      preparedBy:       gv('f_preparedBy')
+    },
+    tables: {}
+  };
+  Object.keys(S.active).forEach(function(k) { if (S.active[k]) payload.tables[k] = S.rows[k]; });
+  loading(true);
+  gasPost('saveEstimate', payload)
+    .then(function(r) { S.currentId = r.id; toast('Saved!', 'ok'); return loadEntries(); })
+    .catch(function(e) { toast('Save failed: ' + e.message, 'err'); })
+    .finally(function() { loading(false); });
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  SCREEN 3 – PREVIEW
+//  Loads preview-template.html once, replaces {{VAR}} placeholders,
+//  then injects dynamic table HTML into {{ESTIMATE_SECTIONS}}.
+// ══════════════════════════════════════════════════════════════════
+
+function previewById(id) {
+  var est = S.estimates.find(function(e) { return e.id === id; });
+  if (!est) { toast('Not found', 'err'); return; }
+  S.currentId = id;
+  var tables = est.data || {};
+  Object.keys(S.active).forEach(function(k) {
+    S.active[k] = !!(tables[k] && tables[k].length);
+    S.rows[k]   = tables[k] || [];
+  });
+  ['clientName','estimationNo','estimateDate','siteAddress','mobile','contactNumber','email','bdo','interiorDesigner','customerCare','preparedBy']
+    .forEach(function(k) { var el = document.getElementById('f_' + k); if (el) el.value = est[k] || ''; });
+  showScreen('preview');
+}
+
+function renderPreview() {
+  var wrap = document.getElementById('previewWrap');
+
+  // Load the preview template if not yet cached
+  if (!S.previewTemplate) {
+    wrap.innerHTML = '<div class="preview-ph">Loading preview template…</div>';
+    fetch('preview-template.html')
+      .then(function(r) {
+        if (!r.ok) throw new Error('preview-template.html not found (HTTP ' + r.status + ')');
+        return r.text();
+      })
+      .then(function(tpl) {
+        S.previewTemplate = tpl;
+        injectPreview(wrap);
+      })
+      .catch(function(e) {
+        wrap.innerHTML = '<div class="preview-ph" style="color:var(--danger)">⚠️ ' + e.message + '<br><small>Make sure preview-template.html is in the same folder as index.html on GitHub.</small></div>';
+      });
+    return;
+  }
+  injectPreview(wrap);
+}
+
+function injectPreview(wrap) {
+  // Replace client placeholders
+  var html = S.previewTemplate;
+  var c = {
+    DATE:               gv('f_estimateDate') || '—',
+    ESTIMATION_NO:      gv('f_estimationNo') || '—',
+    CLIENT_NAME:        gv('f_clientName')   || '—',
+    BDO:                gv('f_bdo')           || '—',
+    SITE_ADDRESS:       gv('f_siteAddress')  || '—',
+    MOBILE:             gv('f_mobile')        || '—',
+    EMAIL:              gv('f_email')         || '—',
+    EMAIL_BDO:          '—',
+    CONTACT_NUMBER:     gv('f_contactNumber') || '—',
+    INTERIOR_DESIGNER:  gv('f_interiorDesigner') || '—',
+    CUSTOMER_CARE:      gv('f_customerCare')  || '+91 8943807777',
+    PREPARED_BY:        gv('f_preparedBy')    || '—'
+  };
+  Object.keys(c).forEach(function(k) {
+    html = html.split('{{'  + k + '}}').join(h(c[k]));
+  });
+
+  // Replace {{ESTIMATE_SECTIONS}} with dynamic table HTML
+  html = html.replace('{{ESTIMATE_SECTIONS}}', buildEstimateSections());
+
+  // Strip the outer <html>/<head>/<body> tags — we only need the inner pages
+  // Extract just the <body> content
+  var bodyMatch = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+  var bodyContent = bodyMatch ? bodyMatch[1] : html;
+
+  wrap.innerHTML = bodyContent;
+}
+
+// ── Build estimate table sections (der.html exact style) ───────────────────────
+function buildEstimateSections() {
+  var TBLS = [
+    { key:'catA',     label:'CATEGORY-A',         cols:['SL NO.','ITEM','SHUTTER FINISH','MATERIAL','UNIT','SIZE','QTY','PRICE'] },
+    { key:'kitAcc',   label:'KITCHEN ACCESSORIES', cols:['SL NO.','PRODUCT','BRAND','ARTICLE NO.','QTY','PRICE','TOTAL'] },
+    { key:'addWorks', label:'ADDITIONAL WORKS',    cols:['SL NO.','ITEM','SHUTTER FINISH','MATERIAL','UNIT','SIZE','QTY','PRICE'] },
+    { key:'catB',     label:'CATEGORY-B',          cols:['SL NO.','ITEM','SHUTTER FINISH','MATERIAL','UNIT','SIZE','QTY','PRICE'] },
+    { key:'gypsum',   label:'GYPSUM CEILING WORK', cols:['SL NO.','ITEM','FINISH','MATERIAL','UNIT','SIZE','PRICE'] }
+  ];
+
+  var html = '';
+
+  TBLS.forEach(function(t) {
+    if (!S.active[t.key] || !S.rows[t.key].length) return;
+
+    var rows = S.rows[t.key];
+    var sub  = rows.reduce(function(s, r) { return s + (parseFloat(r.total)||0); }, 0);
+    var nc   = t.cols.length;
+
+    var bodyRows = rows.map(function(r, i) {
+      var num   = String(i+1).padStart(2, '0');
+      var cells = '<td>' + num + '</td>';
+      if (t.key === 'catA')
+        cells += '<td>' + h(r.item||'—') + '</td><td>' + h(r.shutterFinish||'—') + '</td><td>' + h(r.material||'—') + '</td><td>' + h(r.unit||'—') + '</td><td>' + h(r.size||'—') + '</td><td>' + (r.qty||0) + '</td><td>₹' + fmt(r.price||0) + '</td>';
+      else if (t.key === 'kitAcc')
+        cells += '<td>' + h(r.product||'—') + '</td><td>' + h(r.brand||'—') + '</td><td>' + h(r.articleNo||'—') + '</td><td>' + (r.qty||0) + '</td><td>₹' + fmt(r.price||0) + '</td><td>₹' + fmt(r.total||0) + '</td>';
+      else if (t.key === 'gypsum')
+        cells += '<td>' + h(r.item||'—') + '</td><td>' + h(r.finish||'—') + '</td><td>' + h(r.material||'—') + '</td><td>' + h(r.unit||'—') + '</td><td>' + h(r.size||'—') + '</td><td>₹' + fmt(r.price||0) + '</td>';
+      else
+        cells += '<td>' + h(r.item||'—') + '</td><td>' + h(r.shutterFinish||'—') + '</td><td>' + h(r.material||'—') + '</td><td>' + h(r.unit||'—') + '</td><td>' + h(r.size||'—') + '</td><td>' + (r.qty||0) + '</td><td>₹' + fmt(r.price||0) + '</td>';
+      cells += '<td>₹' + fmt(r.total||0) + '</td>';
+      return '<tr>' + cells + '</tr>';
+    }).join('');
+
+    html +=
+      '<div class="category-badge">' + t.label + '</div>' +
+      '<table class="estimate-table">' +
+        '<thead><tr>' + t.cols.map(function(c) { return '<th>' + c + '</th>'; }).join('') + '</tr></thead>' +
+        '<tbody>' + bodyRows + '</tbody>' +
+        '<tbody><tr class="totals-row">' +
+          '<td colspan="' + (nc-1) + '" style="text-align:right;letter-spacing:1px;font-size:10px;padding-right:12px">' + t.label + ' TOTAL</td>' +
+          '<td>₹' + fmt(sub) + '</td>' +
+        '</tr></tbody>' +
+      '</table><br><br>';
+  });
+
+  return html || '<p style="padding:10px;color:#888">No tables selected.</p>';
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  SCREEN 4 – ADMIN
+// ══════════════════════════════════════════════════════════════════
+function loadAdminData() {
+  loading(true);
+  gasGet('getAdminDropdownData')
+    .then(function(d) { S.adminData = d || {}; renderAdminTable(S.adminTab); })
+    .catch(function(e) { toast('Admin error: ' + e.message, 'err'); })
+    .finally(function() { loading(false); });
+}
+
+function switchAdminTab(key) {
+  S.adminTab = key;
+  document.querySelectorAll('.atab').forEach(function(t) { t.classList.remove('active'); });
+  document.getElementById('atab-' + key).classList.add('active');
+  renderAdminTable(key);
+}
+
+function renderAdminTable(key) {
+  var el  = document.getElementById('adminContent');
+  var sec = S.adminData[key];
+  if (!sec || !sec.data) { el.innerHTML = '<div class="empty">No data</div>'; return; }
+  var isKit = key === 'kitchenAcc';
+  var cols  = sec.cols;
+  var data  = sec.data;
+  if (!data.length) { el.innerHTML = '<div class="empty">No items yet. Click "+ Add Item".</div>'; return; }
+  var dkeys = Object.keys(data[0]).filter(function(k) { return k !== '_rowIndex'; });
+
+  el.innerHTML = '<table class="admin-tbl"><thead><tr>' +
+    (isKit ? '<th>Pic</th>' : '') +
+    cols.map(function(c) { return '<th>' + c + '</th>'; }).join('') +
+    '<th>Actions</th></tr></thead><tbody>' +
+    data.map(function(row, i) {
+      var picCell = '';
+      if (isKit) picCell = '<td>' + (row.pictureUrl ? '<img src="' + h(row.pictureUrl) + '" class="pic-preview" onerror="this.style.display=\'none\'">'  : '<div class="pic-placeholder">🖼</div>') + '</td>';
+      return '<tr>' + picCell +
+        dkeys.map(function(k) {
+          if (isKit && k === 'pictureUrl')
+            return '<td style="min-width:180px"><input class="ai" value="' + h(row[k]||'') + '" placeholder="Paste URL" onchange="adminCell(\''  +key+'\','+i+',\''  +k+'\',this.value)" style="margin-bottom:4px"><input type="file" accept="image/*" onchange="uploadPic(\''  +key+'\','+i+',this)" style="font-size:11px;width:100%"></td>';
+          return '<td><input class="ai" value="' + h(row[k]||'') + '" onchange="adminCell(\''  +key+'\','+i+',\''  +k+'\',this.value)"></td>';
+        }).join('') +
+        '<td style="white-space:nowrap"><button class="btn btn-success btn-sm" onclick="saveAdminRow(\''  +key+'\','+i+')">💾 Save</button> ' +
+        '<button class="btn btn-danger btn-sm" onclick="showAdminDel(\''  +key+'\','+i+')">🗑</button></td></tr>';
+    }).join('') + '</tbody></table>';
+}
+
+function uploadPic(key, i, input) {
+  var file = input.files[0]; if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) { adminCell(key, i, 'pictureUrl', e.target.result); renderAdminTable(key); };
+  reader.readAsDataURL(file);
+}
+
+function adminCell(key, i, f, v) { S.adminData[key].data[i][f] = v; }
+
+function saveAdminRow(key, i) {
+  var sec = S.adminData[key], row = sec.data[i], ri = row._rowIndex;
+  var item = {};
+  Object.keys(row).filter(function(k) { return k !== '_rowIndex'; }).forEach(function(k) { item[k] = row[k]; });
+  loading(true);
+  gasPost('updateDropdownItem', { sheetName: sec.sheetName, rowIndex: ri, item: item })
+    .then(function() { toast('Saved!', 'ok'); return gasGet('getDropdownData'); })
+    .then(function(d) { S.dropdowns = d; })
+    .catch(function(e) { toast('Save failed: ' + e.message, 'err'); })
+    .finally(function() { loading(false); });
+}
+
+function showAddModal() {
+  var key = S.adminTab, sec = S.adminData[key]; if (!sec) return;
+  S.modalEdit = null;
+  document.getElementById('addModalTitle').textContent  = 'Add New Item';
+  document.getElementById('addModalSubmit').textContent = 'Add Item';
+  var dkeys = sec.data.length ? Object.keys(sec.data[0]).filter(function(k) { return k !== '_rowIndex'; }) : [];
+  var isKit = key === 'kitchenAcc';
+  document.getElementById('addModalFields').innerHTML = sec.cols.map(function(col, idx) {
+    var k = dkeys[idx] || idx;
+    if (isKit && k === 'pictureUrl')
+      return '<div class="fg"><label>' + col + '</label><input class="fc" id="addFld_' + k + '" placeholder="Paste image URL"><input type="file" accept="image/*" onchange="modalUploadPic(\''  +k+'\',this)" style="margin-top:4px;font-size:12px"></div>';
+    return '<div class="fg"><label>' + col + '</label><input class="fc" id="addFld_' + k + '" placeholder="' + col + '"></div>';
+  }).join('');
+  document.getElementById('addModal').style.display = 'flex';
+}
+
+function modalUploadPic(fieldId, input) {
+  var file = input.files[0]; if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) { var el = document.getElementById('addFld_' + fieldId); if (el) el.value = e.target.result; };
+  reader.readAsDataURL(file);
+}
+
+function submitModal() {
+  var key = S.adminTab, sec = S.adminData[key];
+  var dkeys = sec.data.length ? Object.keys(sec.data[0]).filter(function(k) { return k !== '_rowIndex'; }) : [];
+  var item = {};
+  dkeys.forEach(function(k) { var el = document.getElementById('addFld_' + k); if (el) item[k] = el.value; });
+  if (!Object.values(item)[0]) { toast('First field required', 'err'); return; }
+  loading(true);
+  gasPost('addDropdownItem', { sheetName: sec.sheetName, item: item })
+    .then(function() { closeModal('addModal'); toast('Added!', 'ok'); return loadAdminData(); })
+    .then(function() { return gasGet('getDropdownData'); })
+    .then(function(d) { S.dropdowns = d; })
+    .catch(function(e) { toast('Error: ' + e.message, 'err'); })
+    .finally(function() { loading(false); });
+}
+
+function showAdminDel(key, i) { S.adminDel = { key:key, i:i }; document.getElementById('adminDelModal').style.display = 'flex'; }
+function confirmAdminDelete() {
+  if (!S.adminDel) return;
+  var key = S.adminDel.key, i = S.adminDel.i;
+  var sec = S.adminData[key], ri = sec.data[i]._rowIndex;
+  loading(true);
+  gasPost('deleteDropdownItem', { sheetName: sec.sheetName, rowIndex: ri })
+    .then(function() { closeModal('adminDelModal'); toast('Deleted', 'ok'); return loadAdminData(); })
+    .then(function() { return gasGet('getDropdownData'); })
+    .then(function(d) { S.dropdowns = d; })
+    .catch(function(e) { toast('Error: ' + e.message, 'err'); })
+    .finally(function() { loading(false); S.adminDel = null; });
+}
+
+// ── Bootstrap ──────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('f_estimateDate').value = new Date().toISOString().split('T')[0];
+
+  // Initialise all screens hidden
+  document.querySelectorAll('.screen').forEach(function(s) { s.style.display = 'none'; s.classList.remove('active'); });
+  var entry = document.getElementById('screen-entries');
+  entry.style.display = 'block'; entry.classList.add('active');
+
+  var url = gasUrl();
+  if (!url) {
+    document.getElementById('configBanner').style.display = 'block';
+    return;
+  }
+
+  loading(true);
+  gasGet('getConfig')
+    .then(function(cfg) {
+      localStorage.setItem(SS_ID_KEY,  cfg.spreadsheetId);
+      localStorage.setItem(SS_URL_KEY, cfg.spreadsheetUrl);
+      showStatusBar(cfg.spreadsheetId, cfg.spreadsheetUrl);
+      return init();
+    })
+    .catch(function(e) {
+      loading(false);
+      document.getElementById('configBanner').style.display = 'block';
+      document.getElementById('gasUrlInput').value = url;
+      toast('Cannot reach backend: ' + e.message, 'err');
+    });
+});
+</script>
 </body>
 </html>
