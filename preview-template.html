@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>A4 Layout</title>
+    <style>
+        body {
+            margin: 0;
+            background: #f0f0f0;
+        }
+
+        .page {
+            width: 210mm;
+            height: 297mm;
+            margin: 20px auto;
+            background: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+            box-sizing: border-box;
+            overflow: hidden;
+            position: relative;  /* 🔴 THIS FIXES EVERYTHING */
+        }
+
+        .header-img {
+            width: 100%;
+            height: 170mm; /* 🔴 adjust height here */
+            
+            background-image: url('Picture1.jpg'); /* 🔴 set image */
+            background-size: cover;
+           
+            background-repeat: no-repeat;
+            position: relative;
+        
+        }
+
+        .overlay-text h1 {
+            margin: 120px 0 0 0;
+            font-size: 36px;
+            
+            line-height: 1.3;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            letter-spacing: 2px;
+        }
+        .overlay-text {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            transform: translateY(-50%); /* center vertically */
+            background: rgba(0, 0, 0, 0.4); /* 🔴 semi-transparent */
+            color: white;
+            padding: 30px 40px;
+            width: 50%;
+            height: 170mm;
+            box-sizing: border-box;
+        }
+
+        .title-text {
+                margin: 120px 0 15px 0;
+                font-size: 36px;       /* 🔴 same as your h1 */
+                line-height: 1.3;
+                font-family: serif;
+                font-weight: normal;   /* 🔴 removes bold look */
+                letter-spacing: 0.5px; /* 🔴 reduce width/spacing */
+                z-index: 10; 
+            }   
+
+        .title-text_1{
+
+                font-size: 45px;       /* 🔴 same as your h1 */
+                line-height: 1.3;
+                font-family: Arial;
+                font-weight: normal;  
+        }
+
+        .first-letter {
+            color: #b79c7d;
+        }
+        /* Full-width image */
+        /*
+        .header-img {
+            width: 100%;
+            height: 100mm; /* adjust height */
+            /*
+            background-image: url('Picture1.jpg'); 
+            background-image: url('your-image.jpg'); /* 🔴 set image */
+            /*
+            background-size: cover;
+
+            background-position: center 50%; /* 🔴 CONTROL Y POSITION HERE */
+            /*
+            background-repeat: no-repeat;
+           object-fit: cover;
+            object-position: middle 50%; /* 🔴 THIS LINE CONTROLS Y POSITION */
+            /*
+            display: block;
+        } 
+        
+       .top-header {
+    position: relative;
+    width: 100%;
+    height: 60mm;
+    background: #f5f5f5;
+}
+
+        /* Left Rectangle */
+        .left-rect {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 12mm;
+            height: 100%;
+            background: #b79c7d; /* beige */
+        }
+
+        /* Right Rectangle */
+        .right-rect {
+            
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 12mm;
+            height: 50%;
+            background: #b79c7d;
+        }
+
+        /* Logo Section */
+        .logo-section {
+            position: absolute;
+            left: 25mm;   /* move right from left bar */
+            top: 15mm;
+        }
+
+        /* Logo Image */
+        .logo {
+            width: 100px;
+            display: block;
+        }
+
+        /* Logo Text */
+        .logo-text {
+            font-size: 14px;
+            letter-spacing: 2px;
+            margin-top: 5px;
+            font-family: Arial;
+        } 
+
+        /* Content with padding */
+        .content {
+            
+            padding: 15mm;
+            font-family:Arial;
+            margin: 0 0 0 430px;
+            font-size: 40px;
+            z-index: 10; 
+        }
+
+        .bottom-section {
+            margin: 50px 0 0 0;
+            position: relative;
+            width: 100%;
+            height: 60mm;
+            background: #fffefe;
+        }
+
+        /* Left vertical bar */
+        .left-rect-bottom {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 12mm;
+            height: 100%;
+            background: #b79c7d;
+        }
+
+        /* Center content */
+        .bottom-content {
+            text-align: center;
+            padding-top: 15mm;
+            font-family: 'Times New Roman', serif;
+            color: #333;
+        }
+
+        /* Tagline */
+        .tagline {
+            font-size: 20px;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+
+        /* Categories */
+        .categories {
+            font-size: 18px;
+            letter-spacing: 1px;
+        }
+
+        .categories span {
+            color: #b79c7d;
+            margin: 0 8px;
+        }
+
+        /* Website (right aligned) */
+        .website {
+            margin: 0 0 0 0;
+            position: absolute;
+            right: 0mm;
+            bottom: 10mm;
+            font-size: 14px;
+            font-family: Arial;
+            
+        }
+
+        /* Underline */
+        .underline {
+            height: 2px;
+            width: 150px;
+            background: #b79c7d;
+            margin-top: 5px;
+        }
+
+
+        /* Print styling */
+        @media print {
+             body {
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+            }
+
+            .page {
+                margin: 0;
+                box-shadow: none;
+                page-break-after: always;
+            }
+        }
+
+        @page {
+            size: A4;
+            margin:0;
+        }
+
+        /* second page */
+                    /* IMAGE GRID */
+            .image-grid {
+                margin: 35px 0 0 0;
+                display: flex;
+                height: 150mm;
+                gap: 6px;                 /* 🔴 space between left & right */
+                padding: 6px;  
+            }
+
+            .left-images {
+                width: 50%;
+                display: flex;
+                flex-direction: column;
+                gap: 6px;      
+            }
+
+            .left-images .img {
+                height: 50%;
+                background-size: cover;
+                background-position: center;
+            }
+
+            .top-img {
+                background-image: url('Image1.jpeg');
+                
+            }
+
+            .bottom-img {
+                
+                background-image: url('Image2.jpeg');
+            }
+
+            .right-image {
+                width: 50%;
+                
+                background-image: url('Image3.jpeg');
+                background-size: cover;
+                background-position: center;
+            }
+
+            /* TEXT SECTION */
+            .text-section {
+                padding: 15mm;
+                font-family: Arial;
+            }
+
+            .text-section h3 {
+                font-size: 18px;
+                margin-bottom: 10px;
+            }
+
+            .sub-text {
+                font-size: 14px;
+                color: #444;
+                line-height: 1.6;
+            }
+
+            /* PROCESS SECTION */
+            .process-section {
+                padding: 10mm 15mm;   /* 🔴 SAME as .text-section */
+                background: #fffefe;
+                position: absolute;
+                bottom: 25mm;
+                width: 100%;
+                box-sizing: border-box;  /* 🔴 ensures padding doesn't overflow */
+            }
+
+            /* TITLE ALIGNMENT */
+            .process-title {
+                text-align: left;        /* 🔴 align with text above */
+                font-size: 13px;
+                color: #444;
+                margin-bottom: 12px;
+                letter-spacing: 1px;
+            }
+
+                        /* STEPS ROW */
+            .process-steps {
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+                text-align: center;
+                gap: 10px;               /* 🔴 spacing between steps */
+            }
+
+            /* EACH STEP */
+            .step {
+                width: 16%;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            /* ICON FIX */
+            .step img {
+                width: 50px;
+                height: 50px;
+                object-fit: contain;
+                margin-bottom: 10px;
+            }
+
+            /* TEXT FIX */
+            .step p {
+                font-size: 9px;
+                line-height: 1.4;
+                text-align: center;
+                min-height: 30px;
+                
+            }
+            /* 3rd page */
+
+                        /* HERO SECTION */
+                        /* OUTER CONTAINER (creates gap) */
+            .hero-section {
+                             /* padding: 8mm;     🔴 GAP around image */
+                box-sizing: border-box;
+            }
+
+            /* INNER IMAGE */
+            .hero-section-inner {
+                width: 100%;
+                height: 170mm;
+                background-image: url('Image4.jpeg');
+                background-size: cover;
+                background-position: center;
+                position: relative;
+                overflow: hidden;             /* 🔴 clean edges */
+            }
+
+            /* OVERLAY FIX */
+            .hero-overlay {
+                position: absolute;
+                inset: 0;                     /* 🔴 FIX alignment (better than width/height) */
+                background: rgba(0,0,0,0.35);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            /* TEXT */
+            .hero-text {
+                color: white;
+                font-size: 70px;              /* 🔴 slightly reduced for fit */
+                text-align: center;
+                line-height: 1.1;
+                font-weight: 300;
+            }
+
+
+
+            /* TABLE SECTION */
+            .table-section {
+                padding: 0;   /* 🔴 remove 15mm */
+                margin-top: 10mm; /* optional spacing between image & table */
+            }
+
+            /* TABLE STYLE */
+            .info-table {
+                width: 100%;
+                border-collapse: collapse;
+                font-family: Arial;
+                font-size: 13px;
+            }
+
+            .info-table td {
+                border: 1px solid #bbb;
+                padding: 8px;
+            }
+
+            /* LIGHT HEADER LOOK */
+            .info-table tr td:nth-child(odd) {
+                background: #f5f5f5;
+                width: 25%;
+            }
+
+            .info-table tr td:nth-child(even) {
+                width: 25%;
+            }
+
+.info-table-new {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    font-family: Arial, sans-serif;
+}
+
+/* CELL STYLE */
+.info-table-new td {
+    border: 1px solid #d6d1c9;
+    padding: 10px 12px;
+    vertical-align: top;
+
+    /* 🔴 makes label look like design */
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    color: #6b6b6b;
+}
+
+/* VALUE (second line) */
+.info-table-new td span {
+    display: block;
+    margin-top: 4px;
+    font-size: 14px;
+    color: #000;
+    letter-spacing: normal;
+}
+
+/* HIGHLIGHT ROW */
+.info-table-new .highlight {
+    background: #0c0c1a;
+    color: #fff;
+}
+
+.info-table-new .highlight span {
+    color: #fff;
+    
+}
+
+/* GOLD LABEL COLOR IN DARK CELL */
+.info-table-new .highlight {
+    color: #c9a96e;
+}
+
+
+.page-inner {
+    padding: 3mm 3mm;   /* 🔴 ONLY this controls width */
+    box-sizing: border-box;
+    
+}
+
+/* 4TH PAGE */
+
+
+/* ===== PAGE 4 ===== */
+/* ===== PAGE 4 TABLE ===== */
+
+/* ===== PAGE 4 ESTIMATE TABLE FINAL OVERRIDE ===== */
+
+.page4-wrap{
+    padding:8mm 4mm 18mm 4mm;
+    box-sizing:border-box;
+    background:#efede8;
+}
+
+.page4-hero{
+    height:42mm;
+    background:url('Image4.jpeg') center/cover no-repeat;
+    margin-bottom:8mm;
+}
+
+/* Category label */
+.category-badge{
+    display:inline-block;
+    background:#0d0d18;
+    color:#c9a84c;
+    padding:10px 22px;
+    font-family:Arial;
+    font-size:11px;
+    letter-spacing:5px;
+    font-weight:700;
+    text-transform:uppercase;
+    margin-bottom:8mm;
+}
+
+.table-block {
+    margin-bottom: 16px;
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+}
+
+.estimate-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    background: #ffffff;
+    font-family: Arial, sans-serif;
+    font-size: 11px;
+}
+
+.estimate-table thead th {
+    background: #0d0d18;
+    color: #c9a84c;
+    padding: 10px 8px;
+    font-size: 10px;
+    letter-spacing: 2.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    text-align: center;
+    border: none;
+}
+
+.estimate-table thead th:first-child {
+    text-align: left;
+    padding-left: 14px;
+}
+
+.estimate-table tbody tr {
+    border-bottom: 1px solid #e0dbd2;
+}
+
+.estimate-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.estimate-table tbody tr:nth-child(even) {
+    background: #f9f7f4;
+}
+
+.estimate-table tbody td {
+    padding: 12px 8px;
+    color: #3a3a3a;
+    text-align: center;
+    border: none;
+    font-size: 11px;
+}
+
+.estimate-table tbody td:first-child {
+    text-align: left;
+    padding-left: 14px;
+    color: #888;
+    font-size: 10px;
+}
+
+.estimate-table tbody td:nth-child(2) {
+    text-align: left;
+}
+
+.estimate-table tbody td:last-child {
+    font-weight: 600;
+    color: #0d0d18;
+}
+
+/* Totals row */
+.totals-row td {
+    background: #f2ede4;
+    font-weight: 700;
+    color: #0d0d18;
+    font-size: 12px;
+    padding: 12px 8px;
+    border-top: 2px solid #c9a84c;
+}
+
+.totals-row td:last-child {
+    color: #c9a84c;
+    font-size: 13px;
+}
+
+
+
+/* ===== EXACT IMAGE STYLE PAGE 5 ===== */
+
+.page5-wrap{
+padding:7mm 10mm 18mm 10mm;
+font-family:"Times New Roman", serif;
+background:#fff;
+}
+
+.material-title{
+font-size:32px;
+font-weight:normal;
+color:#d86f16;
+text-decoration:underline;
+margin-bottom:5mm;
+line-height:1;
+}
+
+.material-box{
+border:1px solid #333;
+padding:6px 10px 6px 10px;
+}
+
+/* Orange section headings */
+.section-label{
+color:#d86f16;
+font-size:18px;
+font-weight:bold;
+margin-top:2px;
+margin-bottom:0;
+line-height:1;
+}
+
+/* Bullet lists */
+.material-list{
+list-style:none;
+margin:0 0 2px 18px;
+padding-left:12px;
+}
+
+.material-list li{
+position:relative;
+font-size:17px;
+line-height:1.0;
+margin-bottom:1px;
+}
+
+.material-list li:before{
+content:"➤";
+position:absolute;
+left:-18px;
+top:0;
+font-size:15px;
+}
+
+/* bottom materials */
+.materials-bottom{
+margin-top:2px;
+border-collapse:collapse;
+font-size:17px;
+}
+
+.materials-bottom td{
+padding:0 18px 0 0;
+line-height:1.0;
+vertical-align:top;
+}
+
+.materials-bottom td:first-child{
+width:180px;
+}
+
+
+/* ===== PAGE 6 WARRANTY ===== */
+
+.page6-wrap{
+display:flex;
+height:100%;
+background:#f4f4f0;
+}
+
+/* LEFT SIDE */
+.warranty-left{
+width:56%;
+background:#bfa582;
+padding:18mm 12mm;
+box-sizing:border-box;
+}
+
+.warranty-title{
+font-family:"Times New Roman", serif;
+font-size:32px;
+letter-spacing:2px;
+margin-bottom:18mm;
+color:#111;
+}
+
+.warranty-item{
+font-family:"Times New Roman", serif;
+font-size:21px;
+line-height:1.15;
+margin-bottom:28mm;
+color:#111;
+padding-left:8mm;
+text-indent:-6mm;
+}
+
+/* RIGHT SIDE */
+.warranty-right{
+width:44%;
+background:#f1f1ed;
+position:relative;
+overflow:hidden;
+}
+
+/* quotation symbol */
+.quote-icon{
+position:absolute;
+top:55mm;
+left:30mm;
+font-size:80px;
+color:#bfa582;
+line-height:1;
+opacity:.9;
+}
+
+/* vertical quote text */
+.vertical-quote{
+position:absolute;
+top:68mm;
+left:34mm;
+width:90px;
+
+font-family:"Times New Roman", serif;
+font-size:17px;
+line-height:1.02;
+letter-spacing:.4px;
+text-transform:uppercase;
+color:#bfa582;
+}
+
+/* bottom room image */
+.sofa-image{
+position:absolute;
+bottom:0;
+right:0;
+width:100%;
+height:140mm;
+
+background-image:url('Image5.jpeg');  /* replace with your sofa image */
+background-size:cover;
+background-position:center bottom;
+background-repeat:no-repeat;
+}
+
+/* subtle bottom bar seen in image */
+.page6-wrap:after{
+content:"";
+position:absolute;
+bottom:0;
+left:0;
+width:100%;
+height:8mm;
+background:#d8d8d4;
+}
+
+
+/* ===== PAGE 7 TERMS ===== */
+
+.page7-wrap{
+padding:8mm 16mm 22mm 16mm;
+box-sizing:border-box;
+background:#ffffff;
+font-family:"Times New Roman", serif;
+position:relative;
+height:100%;
+}
+
+/* thin blue strip top */
+.page7-wrap:before{
+content:"";
+position:absolute;
+top:0;
+left:0;
+width:100%;
+height:3mm;
+background:#dbe7f0;
+}
+
+/* side guide lines */
+.page7-wrap:after{
+content:"";
+position:absolute;
+top:0;
+right:12mm;
+height:100%;
+width:1px;
+background:#cfcfcf;
+}
+
+.page7-wrap{
+border-left:1px solid #cfcfcf;
+margin-left:12mm;
+}
+
+/* title */
+.terms-title{
+margin-top:8mm;
+font-size:26px;
+color:#d9862f;
+text-decoration:underline;
+font-weight:normal;
+margin-bottom:10mm;
+}
+
+/* bullets */
+.terms-list{
+list-style:none;
+margin:0;
+padding:0;
+}
+
+.terms-list li{
+position:relative;
+padding-left:22px;
+font-size:16px;
+line-height:1.9;
+margin-bottom:4px;
+}
+
+.terms-list li:before{
+content:"❖";
+position:absolute;
+left:0;
+top:0;
+font-size:14px;
+}
+
+/* bottom quote */
+.terms-tagline{
+position:absolute;
+bottom:26mm;
+right:18mm;
+display:flex;
+align-items:flex-start;
+color:#b89f7a;
+}
+
+.big-d{
+font-size:84px;
+line-height:.8;
+font-family:"Times New Roman", serif;
+}
+
+.tagline-text{
+margin-left:-8px;
+margin-top:14px;
+font-size:18px;
+line-height:1.05;
+color:#3f3f3f;
+}
+
+    </style>
+</head>
+
+<body>
+
+
+<div class="page">
+
+    <div class="content">
+        <div class="title-text_1">
+            ESTIMATE
+        </div>
+    </div>
+
+   
+
+    <div class="top-header">
+        <div class="left-rect"></div>
+
+        <div class="logo-section">
+            <img src="Logo.png" class="logo">
+        <div class="logo-text">DOC INTERIORS</div>
+        </div>
+
+        <div class="right-rect"></div>
+    </div>
+
+    
+    <div class="header-img">
+        <div class="overlay-text">
+            <div class="title-text">
+            <span class="first-letter">D</span>EPTH<br>
+            <span class="first-letter">O</span>F<br>
+            <span class="first-letter">C</span>REATION
+            </div>
+        </div>
+    </div>
+
+
+     <div class="bottom-section">
+        <div class="left-rect"></div>
+        <div class="bottom-content">
+            <div class="tagline">
+                100% CUSTOMIZED CONTEMPORARY
+            </div>
+
+            <div class="categories">
+                KITCHEN <span>|</span> BEDROOM <span>|</span> LIVING <span>|</span> DINING
+            </div>
+
+            <div class="website">
+                www.docinteriors.com
+            <div class="underline"></div>
+            </div>
+    </div>
+
+    </div>
+    
+
+</div>
+
+
+
+<div class="page">
+
+    <!-- IMAGE GRID -->
+    <div class="image-grid">
+        <div class="left-images">
+            <div class="img top-img"></div>
+            <div class="img bottom-img"></div>
+        </div>
+        <div class="right-image"></div>
+    </div>
+
+    <!-- TEXT SECTION -->
+    <div class="text-section">
+        <h3>Thank you for considering DOC Interiors.</h3>
+
+        <p class="sub-text">
+            Can't wait for more expert insights?<br>
+            We recommend you to get in touch with us whenever possible. 
+            We're always at your service.
+        </p>
+    </div>
+
+    <!-- PROCESS SECTION -->
+    <div class="process-section">
+
+        <div class="process-title">            
+            GET YOUR HOME INTERIOR DONE WITHIN 35-45 WORKING DAYS
+        </div>
+
+        <div class="process-steps">
+
+            <div class="step">
+                <img src="Logo_1.png">
+                <p>SPEAK TO OUR DESIGN CONSULTANT AND</p>
+            </div>
+
+            <div class="step">
+                <img src="Logo_2.png">
+                <p>DETAILED DRAWING AND APPROVAL</p>
+            </div>
+
+            <div class="step">
+                <img src="Logo_3.png">
+                <p>PRODUCTION AT OWN FACTORY</p>
+            </div>
+
+            <div class="step">
+                <img src="Logo_4.png">
+                <p>MATERIAL DELIVERY WITHIN 45 DAYS</p>
+            </div>
+
+            <div class="step">
+                <img src="Logo_5.png">
+                <p>INSTALLATION AT SITE</p>
+            </div>
+
+            <div class="step">
+                <img src="Logo_6.png">
+                <p>ON-TIME PROJECT HANDOVER</p>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="website">
+                www.docinteriors.com
+    <div class="underline"></div>
+    
+
+    </div>
+</div>
+
+
+<div class="page">
+
+  <div class="page-inner">  
+    <!-- HERO IMAGE -->
+  <!-- HERO -->
+        <div class="hero-section">
+            <div class="hero-section-inner">
+                <div class="hero-overlay">
+                    <div class="hero-text">
+                        depth of<br>creation
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <!-- TABLE SECTION -->
+    <div class="table-section"> 
+        <table class="info-table-new">
+
+    <tr>
+        <td>DATE<br><span>{{DATE}}</span></td>
+        <td>ESTIMATION NO.<br><span>{{ESTIMATION_NO}}</span></td>
+    </tr>
+
+    <tr>
+        <td>CLIENT<br><span>{{CLIENT_NAME}}</span></td>
+        <td>BDO<br><span>{{BDO}}</span></td>
+    </tr>
+
+    <tr>
+        <td>SITE ADDRESS<br><span>{{SITE_ADDRESS}}</span></td>
+        <td>MOBILE<br><span>{{MOBILE}}</span></td>
+    </tr>
+
+    <tr>
+        <td>E-MAIL<br><span>{{EMAIL}}</span></td>
+        <td>E-MAIL (BDO)<br><span>{{EMAIL_BDO}}</span></td>
+    </tr>
+
+    <tr>
+        <td>CONTACT NUMBER<br><span>{{CONTACT_NUMBER}}</span></td>
+        <td>INTERIOR DESIGNER<br><span>{{INTERIOR_DESIGNER}}</span></td>
+    </tr>
+
+    <tr>
+        <td class="highlight">CUSTOMER CARE<br><span>{{CUSTOMER_CARE}}</span></td>
+        <td>PREPARED BY<br><span>{{PREPARED_BY}}</span></td>
+    </tr>
+
+        </table>
+    </div>
+    </div>
+
+     <div class="website">
+                www.docinteriors.com
+    <div class="underline"></div>
+
+    
+
+    </div>
+    </div>
+
+
+<div class="page">
+
+
+    <div class="sub-header">
+      SUB: ESTIMATE FOR WOOD WORK, ACCESSORIES AND BEAUTIFICATION
+    </div>
+
+
+    <div class="page4-hero"></div>
+
+<div class="page4-wrap">
+
+<section class="estimate-section">{{ESTIMATE_SECTIONS}}</section>
+
+</div>
+
+<div class="website">
+    www.docinteriors.com
+    <div class="underline"></div>
+</div>
+
+</div>
+
+
+<div class="page">
+
+<div class="page5-wrap">
+
+    <div class="material-title">
+        MATERIAL OPTIONS
+    </div>
+
+    <div class="material-box">
+
+        <div class="section-label">Shutter Option :</div>
+
+        <ul class="material-list">
+            <li>Laminated shutter on HDHMR Exterior grade HDF(Action Teza HDF,Laminate-GreenLam Merrino, NewMica)</li>
+            <li>Acrylic shutter on HDHMR Exterior grade HDF(Action Teza HDF, Acrylic-Dimond Décor)</li>
+            <li>Glass shutter on 16mm Marine plywood (Marine Ply-Famous, Glass-4mm Saint Gobain Planilaque glass)</li>
+            <li>Veneer shutter on 18mm Pvc & Marine Plywood (Veneer-Decowood Greenlam)</li>
+            <li>PU Finish, Glass and Stain Finish</li>
+            <li>PVC Laminate shutter on HDHMR Exterior grade</li>
+            <li>Shutter aristo brand</li>
+        </ul>
+
+        <div class="section-label">Shutter:</div>
+        <ul class="material-list">
+            <li>Both side Laminated HDHMR Exterior grade HDF Board with matching edge banding on sides</li>
+        </ul>
+
+        <div class="section-label">Carcass :</div>
+        <ul class="material-list">
+            <li>Both side cold pressed laminated marine grade plywood BWP(Boiling Water Proof)with water resistance testing after 72hrs of boiling edge banded on the side of 18mm</li>
+        </ul>
+
+        <div class="section-label">Skirting:</div>
+        <ul class="material-list">
+            <li>Laminated skirting</li>
+        </ul>
+
+        <div class="section-label">Fittings:</div>
+        <ul class="material-list">
+            <li>SS</li>
+        </ul>
+
+        <div class="section-label">Accessories:</div>
+        <ul class="material-list">
+            <li>Hettich</li>
+        </ul>
+
+        <div class="section-label">Edge Banding:</div>
+        <ul class="material-list">
+            <li>All four side on the carcass and shutter with corner rounding wherever applicable, premium Edge banding tapes.</li>
+        </ul>
+
+        <div class="section-label">Carcass Back panel:</div>
+        <ul class="material-list">
+            <li>8mm PVC Board</li>
+        </ul>
+
+        <div class="section-label">Sink cabinet & wash counters:</div>
+        <ul class="material-list">
+            <li>17mm PVC Foam board with a smooth matte finish Tolerance +/-1mm</li>
+        </ul>
+
+        <br>
+
+        <div class="section-label">Materials:</div>
+
+        <table class="materials-bottom">
+            <tr>
+                <td>➤ Marine Plywood-</td>
+                <td>Famous.</td>
+            </tr>
+            <tr>
+                <td>➤ Wpc</td>
+                <td>- Demac/Thomson</td>
+            </tr>
+            <tr>
+                <td>➤ Laminate</td>
+                <td>- Greenlam / Newmika/ Merrino</td>
+            </tr>
+            <tr>
+                <td>➤ Accessories</td>
+                <td>- Hettich</td>
+            </tr>
+        </table>
+
+    </div>
+
+</div>
+
+<div class="website">
+www.docinteriors.com
+<div class="underline"></div>
+</div>
+
+</div>
+
+
+<div class="page">
+
+<div class="page6-wrap">
+
+    <!-- LEFT TAN PANEL -->
+    <div class="warranty-left">
+
+        <div class="warranty-title">
+            WARRANTY
+        </div>
+
+        <div class="warranty-item">
+            ❖ 10 Years warranty against avoidable, unnatural defects in
+            material supplied under normal usage.
+        </div>
+
+        <div class="warranty-item">
+            ❖ Manufactures warranty for fittings, hardware and accessories.
+        </div>
+
+        <div class="warranty-item">
+            ❖ Life time service will be provided up till 1st year two free
+            service after that per visit chargeable at Rs.2000/- plus any
+            replacement charges.
+        </div>
+
+    </div>
+
+
+    <!-- RIGHT PANEL -->
+    <div class="warranty-right">
+
+        <div class="quote-icon">
+            ❝
+        </div>
+
+        <div class="vertical-quote">
+            THE KEY TO GREATEST DESIGNING IS CAPTURING THE SPIRIT OF THE CLIENT AND THE ESSENCE OF THE SPACE
+        </div>
+
+        <div class="sofa-image"></div>
+
+    </div>
+
+</div>
+
+<div class="website">
+www.docinteriors.com
+<div class="underline"></div>
+</div>
+
+</div>
+
+
+<div class="page">
+
+<div class="page7-wrap">
+
+    <div class="terms-title">
+        TERMS AND CONDITIONS
+    </div>
+
+    <ul class="terms-list">
+
+        <li>The estimation and quotation are prepared in accordance with the provided terms and conditions.</li>
+
+        <li>Once the design is finalized, no changes will be permitted in production drawings.</li>
+
+        <li>Two 3D design revisions are provided free of cost; further changes will incur extra charges.</li>
+
+        <li>The 3D design may include elements for aesthetic purposes only; such items are not part of the quotation and will incur extra charges if required.</li>
+
+        <li>The scope of work is limited to interior views only. Exterior, courtyard, and other external views are excluded.</li>
+
+        <li>The quotation does not include appliances such as chimney, hob, sink, or any other accessories.</li>
+
+        <li>The quotation excludes supply and installation of lighting, LED strips, granite, tiles, and related materials, as well as all plumbing, electrical, masonry, fittings, and associated labor charges.</li>
+
+        <li>Any handle’s cost above ₹300 per item will be billed additionally in quotation.</li>
+
+        <li>The client shall provide a continuous electricity supply required for operating machinery during execution.</li>
+
+        <li>The client is responsible for ensuring a safe and conducive working environment at the site.</li>
+
+        <li>The client must provide a secure space for storage of materials and machinery brought to the site.</li>
+
+        <li>Any unloading charges exceeding ₹3,000/- shall be borne directly by the client.</li>
+
+        <li>The client shall obtain all necessary permissions and approvals from building authorities, apartment associations, municipal bodies, electrical boards, and any other relevant authorities required for execution of the work.</li>
+
+        <li>Any changes in design or specifications after finalization will result in a revision of the quotation.</li>
+
+        <li>This quotation is valid for a period of one (1) month from the date of issue.</li>
+
+    </ul>
+
+    <div class="terms-tagline">
+        <span class="big-d">D</span>
+        <div class="tagline-text">
+            ESIGN IS THINKING<br>
+            MADE VISUAL
+        </div>
+    </div>
+
+</div>
+
+<div class="website">
+www.docinteriors.com
+<div class="underline"></div>
+</div>
+
+</div>
+
+
+</body>
+</html>
