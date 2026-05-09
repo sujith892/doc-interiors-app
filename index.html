@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DOC Interiors – Estimation App</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<!-- ══════════════════════════════════
+     CONFIG BANNER  (first-time setup)
+     ══════════════════════════════════ -->
+<div id="configBanner" class="config-banner hidden">
+  <div class="config-inner">
+    <div style="font-size:15px;font-weight:700;margin-bottom:6px;">⚙️ First-Time Setup</div>
+    <div style="font-size:13px;opacity:.85;margin-bottom:12px;">
+      Paste your <strong>Google Apps Script Web App URL</strong> below.<br>
+      The Spreadsheet ID will be fetched <em>automatically</em> from your <code>Code.gs</code> — you don't need to enter it here.
+    </div>
+    <div class="config-input-row">
+      <input type="text" id="gasUrlInput"
+        placeholder="https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec" />
+      <button onclick="APP.saveGasUrl()">Connect →</button>
+    </div>
+    <div style="font-size:11px;opacity:.55;margin-top:8px;">
+      💡 Get this URL from: Apps Script editor → Deploy → Manage deployments → copy the Web App URL
+    </div>
+  </div>
+</div>
+
+<!-- Status bar: shows which spreadsheet is active -->
+<div id="statusBar" class="status-bar hidden"></div>
+
+<!-- ══════════════════════════════════
+     NAVBAR
+     ══════════════════════════════════ -->
+<nav class="navbar">
+  <div class="nav-brand">
+    <div class="nav-bar"></div>
+    <span class="nav-title">DOC <span class="gold">INTERIORS</span></span>
+  </div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" data-screen="entries"  onclick="APP.showScreen('entries')">📋 Entries</button>
+    <button class="nav-tab"        data-screen="edit"     onclick="APP.showScreen('edit')">✏️ New / Edit</button>
+    <button class="nav-tab"        data-screen="preview"  onclick="APP.showScreen('preview')">👁 Preview</button>
+    <button class="nav-tab"        data-screen="admin"    onclick="APP.showScreen('admin')">⚙️ Admin</button>
+  </div>
+  <button class="nav-settings" title="Change GAS URL" onclick="APP.openConfig()">🔗</button>
+</nav>
+
+<!-- toast -->
+<div id="toast" class="toast hidden"></div>
+
+<!-- loading -->
+<div id="loading" class="loading-overlay hidden">
+  <div class="spinner"></div><p>Please wait…</p>
+</div>
+
+<!-- ══════════════════════════════════
+     SCREEN 1 – ENTRIES
+     ══════════════════════════════════ -->
+<section id="screen-entries" class="screen active">
+  <div class="screen-header">
+    <div>
+      <h2>📋 All Estimates</h2>
+      <p class="sub">Saved entries loaded from Google Sheets</p>
+    </div>
+    <div class="hdr-actions">
+      <input id="searchInput" type="text" class="search-box" placeholder="🔍 Search client, ID…" oninput="APP.filterEntries()" />
+      <button class="btn btn-primary" onclick="APP.startNew()">+ New Estimate</button>
+      <button class="btn btn-outline btn-sm" onclick="APP.loadEntries()">↻ Refresh</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="table-scroll">
+      <table class="data-table" id="entriesTable">
+        <thead>
+          <tr>
+            <th>#</th><th>Est. No.</th><th>Client Name</th><th>Site Address</th>
+            <th>Mobile</th><th>Est. Date</th><th>Prepared By</th><th>Status</th><th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="entriesBody">
+          <tr><td colspan="9" class="empty">Loading…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════
+     SCREEN 2 – EDIT / NEW
+     ══════════════════════════════════ -->
+<section id="screen-edit" class="screen hidden">
+
+  <div class="screen-header">
+    <div>
+      <h2 id="editTitle">✏️ New Estimate</h2>
+      <p class="sub" id="editSub">Fill client details and select tables</p>
+    </div>
+    <div class="hdr-actions">
+      <button class="btn btn-outline" onclick="APP.showScreen('entries')">← Back</button>
+      <button class="btn btn-success" onclick="APP.saveEstimate()">💾 Save</button>
+    </div>
+  </div>
+
+  <!-- CLIENT CARD -->
+  <div class="card mb">
+    <div class="card-header">
+      <span class="card-title">👤 Client Details</span>
+      <span class="badge-mandatory">MANDATORY</span>
+    </div>
+    <div class="form-grid">
+      <div class="fg"><label>Client Name *</label>     <input class="fc" id="f_clientName"      type="text"  placeholder="Full name" /></div>
+      <div class="fg"><label>Estimation No.</label>    <input class="fc" id="f_estimationNo"   type="text"  placeholder="DOC-2024-001" /></div>
+      <div class="fg"><label>Estimate Date *</label>   <input class="fc" id="f_estimateDate"   type="date" /></div>
+      <div class="fg"><label>Site Address</label>      <input class="fc" id="f_siteAddress"    type="text"  placeholder="Project address" /></div>
+      <div class="fg"><label>Mobile</label>            <input class="fc" id="f_mobile"         type="text"  placeholder="+91 XXXXXXXXXX" /></div>
+      <div class="fg"><label>Contact Number</label>    <input class="fc" id="f_contactNumber"  type="text"  placeholder="Alternate" /></div>
+      <div class="fg"><label>Email</label>             <input class="fc" id="f_email"          type="email" placeholder="client@email.com" /></div>
+      <div class="fg"><label>BDO</label>               <input class="fc" id="f_bdo"            type="text"  placeholder="Business Development Officer" /></div>
+      <div class="fg"><label>Interior Designer</label> <input class="fc" id="f_interiorDesigner" type="text" placeholder="Designer name" /></div>
+      <div class="fg"><label>Customer Care</label>     <input class="fc" id="f_customerCare"   type="text"  placeholder="+91 XXXXXXXXXX" /></div>
+      <div class="fg"><label>Prepared By</label>       <input class="fc" id="f_preparedBy"     type="text"  placeholder="Staff name" /></div>
+    </div>
+  </div>
+
+  <!-- TABLE TOGGLE CARD -->
+  <div class="card mb">
+    <div class="card-header"><span class="card-title">📊 Select Tables</span></div>
+    <div class="table-toggles">
+      <button class="ttbtn mandatory">👤 Client (Mandatory)</button>
+      <button class="ttbtn" id="tog-catA"     onclick="APP.toggleTable('catA')">📦 Category-A</button>
+      <button class="ttbtn" id="tog-kitAcc"   onclick="APP.toggleTable('kitAcc')">🍳 Kitchen Accessories</button>
+      <button class="ttbtn" id="tog-addWorks" onclick="APP.toggleTable('addWorks')">🔧 Additional Works</button>
+      <button class="ttbtn" id="tog-catB"     onclick="APP.toggleTable('catB')">📦 Category-B</button>
+      <button class="ttbtn" id="tog-gypsum"   onclick="APP.toggleTable('gypsum')">🏠 Gypsum Ceiling</button>
+    </div>
+  </div>
+
+  <!-- ── CATEGORY-A ── -->
+  <div id="blk-catA" class="est-block hidden">
+    <div class="blk-hdr"><span>📦 CATEGORY – A</span><span class="blk-hint">SIZE_X × SIZE_Y → QTY_SQFT auto-calc</span></div>
+    <div class="blk-body">
+      <div class="tbl-scroll">
+        <table class="est-tbl">
+          <thead><tr>
+            <th>SL</th><th>Category</th><th>Item</th><th>Shutter Finish</th><th>Material</th>
+            <th>Unit</th><th>Size</th><th>Size X</th><th>Size Y</th>
+            <th>QTY SQFT</th><th>QTY</th><th>Price</th><th>Total</th><th></th>
+          </tr></thead>
+          <tbody id="tb-catA"></tbody>
+          <tfoot><tr class="tot-row">
+            <td colspan="12" class="tot-label">CATEGORY-A TOTAL</td>
+            <td id="tot-catA">₹0</td><td></td>
+          </tr></tfoot>
+        </table>
+      </div>
+    </div>
+    <button class="add-row-btn" onclick="APP.addRow('catA')">+ Add Row</button>
+  </div>
+
+  <!-- ── KITCHEN ACCESSORIES ── -->
+  <div id="blk-kitAcc" class="est-block hidden">
+    <div class="blk-hdr"><span>🍳 KITCHEN ACCESSORIES</span><span class="blk-hint">Brand / Article No auto-fill on product select</span></div>
+    <div class="blk-body">
+      <div class="tbl-scroll">
+        <table class="est-tbl">
+          <thead><tr>
+            <th>SL</th><th>Product</th><th>Brand</th><th>Article No</th>
+            <th>Picture URL</th><th>QTY</th><th>Price</th><th>Total</th><th></th>
+          </tr></thead>
+          <tbody id="tb-kitAcc"></tbody>
+          <tfoot><tr class="tot-row">
+            <td colspan="6" class="tot-label">KITCHEN ACCESSORIES TOTAL</td>
+            <td id="tot-kitAcc">₹0</td><td></td><td></td>
+          </tr></tfoot>
+        </table>
+      </div>
+    </div>
+    <button class="add-row-btn" onclick="APP.addRow('kitAcc')">+ Add Row</button>
+  </div>
+
+  <!-- ── ADDITIONAL WORKS ── -->
+  <div id="blk-addWorks" class="est-block hidden">
+    <div class="blk-hdr"><span>🔧 ADDITIONAL WORKS</span></div>
+    <div class="blk-body">
+      <div class="tbl-scroll">
+        <table class="est-tbl">
+          <thead><tr>
+            <th>SL</th><th>Category</th><th>Item</th><th>Shutter Finish</th>
+            <th>Material</th><th>Unit</th><th>Size</th><th>QTY</th><th>Price</th><th>Total</th><th></th>
+          </tr></thead>
+          <tbody id="tb-addWorks"></tbody>
+          <tfoot><tr class="tot-row">
+            <td colspan="8" class="tot-label">ADDITIONAL WORKS TOTAL</td>
+            <td id="tot-addWorks">₹0</td><td></td><td></td>
+          </tr></tfoot>
+        </table>
+      </div>
+    </div>
+    <button class="add-row-btn" onclick="APP.addRow('addWorks')">+ Add Row</button>
+  </div>
+
+  <!-- ── CATEGORY-B ── -->
+  <div id="blk-catB" class="est-block hidden">
+    <div class="blk-hdr"><span>📦 CATEGORY – B</span></div>
+    <div class="blk-body">
+      <div class="tbl-scroll">
+        <table class="est-tbl">
+          <thead><tr>
+            <th>SL</th><th>Category</th><th>Item</th><th>Shutter Finish</th>
+            <th>Material</th><th>Unit</th><th>Size</th><th>QTY</th><th>Price</th><th>Total</th><th></th>
+          </tr></thead>
+          <tbody id="tb-catB"></tbody>
+          <tfoot><tr class="tot-row">
+            <td colspan="8" class="tot-label">CATEGORY-B TOTAL</td>
+            <td id="tot-catB">₹0</td><td></td><td></td>
+          </tr></tfoot>
+        </table>
+      </div>
+    </div>
+    <button class="add-row-btn" onclick="APP.addRow('catB')">+ Add Row</button>
+  </div>
+
+  <!-- ── GYPSUM CEILING ── -->
+  <div id="blk-gypsum" class="est-block hidden">
+    <div class="blk-hdr"><span>🏠 GYPSUM CEILING WORK</span></div>
+    <div class="blk-body">
+      <div class="tbl-scroll">
+        <table class="est-tbl">
+          <thead><tr>
+            <th>SL</th><th>Category</th><th>Item</th><th>Finish</th>
+            <th>Material</th><th>Unit</th><th>Size</th><th>Price</th><th>Total</th><th></th>
+          </tr></thead>
+          <tbody id="tb-gypsum"></tbody>
+          <tfoot><tr class="tot-row">
+            <td colspan="7" class="tot-label">GYPSUM CEILING TOTAL</td>
+            <td id="tot-gypsum">₹0</td><td></td><td></td>
+          </tr></tfoot>
+        </table>
+      </div>
+    </div>
+    <button class="add-row-btn" onclick="APP.addRow('gypsum')">+ Add Row</button>
+  </div>
+
+  <!-- GRAND TOTAL -->
+  <div class="grand-total-bar">
+    <div>
+      <div class="gt-label">Grand Total</div>
+      <div class="gt-sub">Sum of all active table sub-totals</div>
+    </div>
+    <div class="gt-value" id="grandTotal">₹0</div>
+  </div>
+
+</section>
+
+<!-- ══════════════════════════════════
+     SCREEN 3 – PREVIEW
+     ══════════════════════════════════ -->
+<section id="screen-preview" class="screen hidden">
+  <div class="screen-header">
+    <div>
+      <h2>👁 Estimate Preview</h2>
+      <p class="sub">A4 document preview — use Print to export as PDF</p>
+    </div>
+    <div class="hdr-actions">
+      <button class="btn btn-outline" onclick="APP.showScreen('edit')">← Back to Edit</button>
+      <button class="btn btn-primary" onclick="window.print()">🖨 Print / PDF</button>
+    </div>
+  </div>
+  <div id="previewWrap" class="preview-wrap">
+    <div class="preview-placeholder">Open or create an estimate to see the A4 preview.</div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════
+     SCREEN 4 – ADMIN
+     ══════════════════════════════════ -->
+<section id="screen-admin" class="screen hidden">
+  <div class="screen-header">
+    <div>
+      <h2>⚙️ Admin – Dropdown Management</h2>
+      <p class="sub">Add, edit or delete values that appear in the dropdowns</p>
+    </div>
+    <button class="btn btn-primary" onclick="APP.showAddModal()">+ Add Item</button>
+  </div>
+
+  <div class="admin-tabs" id="adminTabs">
+    <button class="atab active" id="atab-catA"          onclick="APP.switchAdminTab('catA')">Category-A</button>
+    <button class="atab"        id="atab-catB"          onclick="APP.switchAdminTab('catB')">Category-B</button>
+    <button class="atab"        id="atab-additionalWorks" onclick="APP.switchAdminTab('additionalWorks')">Additional Works</button>
+    <button class="atab"        id="atab-gypsum"        onclick="APP.switchAdminTab('gypsum')">Gypsum</button>
+    <button class="atab"        id="atab-kitchenAcc"    onclick="APP.switchAdminTab('kitchenAcc')">Kitchen Accessories</button>
+  </div>
+
+  <div class="card">
+    <div id="adminContent" class="table-scroll"><div class="empty">Loading…</div></div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════
+     MODALS
+     ══════════════════════════════════ -->
+
+<!-- Delete estimate -->
+<div id="delModal" class="modal-overlay hidden">
+  <div class="modal">
+    <h3>🗑 Delete Estimate?</h3>
+    <p>This cannot be undone.</p>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="APP.closeModal('delModal')">Cancel</button>
+      <button class="btn btn-danger"  onclick="APP.confirmDelete()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- Admin add/edit -->
+<div id="addModal" class="modal-overlay hidden">
+  <div class="modal" style="max-width:520px">
+    <h3 id="addModalTitle">Add New Item</h3>
+    <div id="addModalFields" class="modal-fields"></div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="APP.closeModal('addModal')">Cancel</button>
+      <button class="btn btn-primary" id="addModalSubmit" onclick="APP.submitModal()">Add Item</button>
+    </div>
+  </div>
+</div>
+
+<!-- Admin delete -->
+<div id="adminDelModal" class="modal-overlay hidden">
+  <div class="modal">
+    <h3>🗑 Delete Dropdown Item?</h3>
+    <p>This removes the option from all dropdown menus.</p>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="APP.closeModal('adminDelModal')">Cancel</button>
+      <button class="btn btn-danger"  onclick="APP.confirmAdminDelete()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/app.js"></script>
+</body>
+</html>
